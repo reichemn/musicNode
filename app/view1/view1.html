@@ -1,1 +1,19 @@
-<p>This is the partial for view 1.</p>
+<p>All Songs</p>
+Search:<input ng-model="query" type="text"/>
+<hr>
+<table width="70%">
+    <tr>
+        <th>Title</th>
+        <th>Artist</th>
+        <th>Album</th>
+        <th>Image</th>
+        <th>Action</th>
+    </tr>
+    <tr ng-repeat="song in allSongs | filter:query">
+        <td>{{song.title}}</td>
+        <td>{{song.interpret}}</td>
+        <td>{{song.album}}</td>
+        <td><img ng-src="{{song.image.thumbnailPath}}" width="50"></td>
+        <td> <a href="" ng-click="playSong(song.id)">Play</a></td>
+    </tr>
+</table>
