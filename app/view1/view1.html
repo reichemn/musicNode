@@ -1,5 +1,24 @@
 <p>All Songs</p>
-Search:<input ng-model="query" type="text"/>
+Search:<input ng-model="queryInput" ng-change=changeFilter() type="text"/>
+<form name="querySelect" >
+    <label>
+        <input type="radio" ng-model="selectedFilter" value="all" ng-click=changeFilter()>
+        All
+    </label><br/>
+    <label>
+        <input type="radio" ng-model="selectedFilter" value="title" ng-click=changeFilter()>
+        Title
+    </label><br/>
+    <label>
+        <input type="radio" ng-model="selectedFilter" value="album" ng-click=changeFilter()>
+        Album
+    </label><br/>
+    <label>
+        <input type="radio" ng-model="selectedFilter" value="artist" ng-click=changeFilter()>
+        Artist
+    </label><br/>
+</form>
+
 <hr>
 <table width="70%">
     <tr>
@@ -11,7 +30,7 @@ Search:<input ng-model="query" type="text"/>
     </tr>
     <tr ng-repeat="song in allSongs | filter:query">
         <td>{{song.title}}</td>
-        <td>{{song.interpret}}</td>
+        <td>{{song.artist}}</td>
         <td>{{song.album}}</td>
         <td><img ng-src="{{song.image.thumbnailPath}}" width="50"></td>
         <td> <a href="" ng-click="playSong(song.id)">Play</a></td>
