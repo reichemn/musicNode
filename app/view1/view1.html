@@ -28,7 +28,7 @@ Search:<input ng-model="queryInput" ng-change=changeFilter() type="text"/>
         <th>Image</th>
         <th>Action</th>
     </tr>
-    <tr ng-repeat="song in allSongs | filter:query">
+    <tr ng-repeat="song in filteredSongs">
         <td>{{song.title}}</td>
         <td>{{song.artist}}</td>
         <td>{{song.album}}</td>
