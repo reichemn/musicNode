@@ -3,8 +3,10 @@
 // Declare app level module which depends on views, and components
 
 
+console.log("app.js executed");
 
 angular.module('myApp', [
+  'btford.socket-io',
   'ngRoute',
   'myApp.view1',
   'myApp.view2',
@@ -15,3 +17,4 @@ config(['$locationProvider', '$routeProvider', function($locationProvider, $rout
 
   $routeProvider.otherwise({redirectTo: '/view1'});
 }]);
+
