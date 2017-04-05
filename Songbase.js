@@ -3,7 +3,7 @@
  */
 
 const importFolder = "./songbase/import";
-const audioFileExtensions = [".mp3",".aac"];
+const audioFileExtensions = [".mp3", ".aac"];
 var jsonfile = require('jsonfile');
 const fs = require('fs');
 var path = require('path');
@@ -12,20 +12,20 @@ const md5File = require('md5-file');
 var id3 = require('id3js');
 var HashMap = require('hashmap');
 
-var songList = [];
+//var songList = [];
 var playlistList = [];
 var songMap = new HashMap();
 var load = function () {
-    jsonfile.readFilesync(file, function(err, obj) {
+    jsonfile.readFilesync(file, function (err, obj) {
         console.dir(obj);
-        songList = obj.songList;
+        songMap = obj.songMao;
         playlistList = obj.playlistList;
     });
     console.log("Songbase loaded.");
 };
 
 var save = function () {
-    var obj = {"songList":songList, "playlistList":playlistList};
+    var obj = {"songMap": songMap, "playlistList": playlistList};
     jsonfile.writeFileSync(file, obj, function (err) {
         console.error(err);
     });
@@ -33,7 +33,7 @@ var save = function () {
 };
 
 var getSongList = function () {
-    return songList;
+    return songMap.values();
 };
 
 var getPlaylistList = function () {
@@ -43,12 +43,12 @@ var getPlaylistList = function () {
 var checkNewSongs = function () {
     var audioFiles;
     //Suche nach Audiodateien im import ordner
-    walk(importFolder, function(err, results) {
+    walk(importFolder, function (err, results) {
         if (err) throw err;
         console.log(results);
         audioFiles = results;
     });
-    for(var i = 0; i< audioFiles.length;i++){
+    for (var i = 0; i < audioFiles.length; i++) {
         importSong(audioFiles[i]);
     }
 
@@ -83,15 +83,15 @@ importSong = function (songPath) {
     }
     var newSongPath = "./songbase/songs";
 
-    console.log("Import: "+splitedImportPath);
-    console.log("Song: "+splitedSongPath);
+    console.log("Import: " + splitedImportPath);
+    console.log("Song: " + splitedSongPath);
     console.log(newSongPath);
 
     if (pathEqual) {
         for (var i = splitedImportPath.length; i < splitedSongPath.length; i++) {
             newSongPath = path.join(newSongPath, splitedSongPath[i]);
         }
-    }else{
+    } else {
         newSongPath = path.join(newSongPath, path.basename(songPath));
     }
 
@@ -100,45 +100,49 @@ importSong = function (songPath) {
 
     });
     song.source = {
-        "type":"local",
-        "path":newSongPath
+        "type": "local",
+        "path": newSongPath
     };
     addSong(song);
 };
 
 var addSong = function (song) {
-    songList.push(song);
+    // songList.push(song);
     songMap.put(song.id, song);
 
 };
 
-var getSongByID= function (songID) {
+var getSongByID = function (songID) {
     return songMap.get(songID);
-}
+};
+
+var replaceSong = function (song) {
+    songMap.put(song.id, song);
+};
 
 var isAudiofile = function (path) {
     // Todo: teste ob dateiendung stimmt
     var extension = path.extname(path);
-    for(var i = 0; i<audioFileExtensions.length;i++){
-        if(audioFileExtensions[i]==extension){
+    for (var i = 0; i < audioFileExtensions.length; i++) {
+        if (audioFileExtensions[i] == extension) {
             return true;
         }
     }
     return false;
 };
 
-var walk = function(dir, done) {
+var walk = function (dir, done) {
     var results = [];
-    fs.readdir(dir, function(err, list) {
+    fs.readdir(dir, function (err, list) {
         if (err) return done(err);
         var i = 0;
         (function next() {
             var file = list[i++];
             if (!file) return done(null, results);
             file = path.resolve(dir, file);
-            fs.stat(file, function(err, stat) {
+            fs.stat(file, function (err, stat) {
                 if (stat && stat.isDirectory()) {
-                    walk(file, function(err, res) {
+                    walk(file, function (err, res) {
                         results = results.concat(res);
                         next();
                     });
@@ -151,12 +155,13 @@ var walk = function(dir, done) {
     });
 };
 
-module.exports={
-    "load" : load,
-    "save" : save,
-    "getSongList" : getSongList,
-    "getPlaylistList" : getPlaylistList,
-    "checkNewSongs" : checkNewSongs,
-    "getSongByID" : getSongByID
+module.exports = {
+    "load": load,
+    "save": save,
+    "getSongList": getSongList,
+    "getPlaylistList": getPlaylistList,
+    "checkNewSongs": checkNewSongs,
+    "getSongByID": getSongByID,
+    "replaceSong" : replaceSong
 
 };
