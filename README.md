@@ -1,4 +1,4 @@
-mpg123 [mpg123] muss unter ./mpg123/ liegen.
+[mpg123] muss unter ./mpg123/ liegen.
 
 # `angular-seed` — the seed for AngularJS apps
 
