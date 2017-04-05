@@ -15,7 +15,7 @@ angular.module('myApp.view1', ['ngRoute'])
     var song3 = new Song(2,"Song 3","zweiter interpret","zweites album",new SongImage(2,"http://kingofwallpapers.com/song/song-001.jpg","https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcT8_SonIBak5_M_5V-IN6MSA2YRJR78X7pvw4hyVYioVwRKtaU-ew"),null);
   scope.allSongs = [song1,song2,song3];
   scope.playSong = function (id) {
-    alert("Play Song "+id+"\nFunktion nicht implementiert!");
+   // alert("Play Song "+id+"\nFunktion nicht implementiert!");
       // Todo: Server kommunikation
       socket.emit("command:play",id);
   };

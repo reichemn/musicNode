@@ -3,6 +3,9 @@
  */
 
 
+//Todo: Songverwaltung
+//Todo: Now Playing sollte im Menue angezeigt werden, nicht in der aktuellen view
+//Todo: Playlists
 
 
 var player = require("play-sound")({"player" : "./mpg123/mpg123.exe"});
