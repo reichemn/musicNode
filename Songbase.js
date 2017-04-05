@@ -18,7 +18,7 @@ var songMap = new HashMap();
 var load = function () {
     jsonfile.readFilesync(file, function (err, obj) {
         console.dir(obj);
-        songMap = obj.songMao;
+        songMap = obj.songMap;
         playlistList = obj.playlistList;
     });
     console.log("Songbase loaded.");
@@ -108,7 +108,7 @@ importSong = function (songPath) {
 
 var addSong = function (song) {
     // songList.push(song);
-    songMap.put(song.id, song);
+    songMap.set(song.id, song);
 
 };
 
@@ -117,7 +117,7 @@ var getSongByID = function (songID) {
 };
 
 var replaceSong = function (song) {
-    songMap.put(song.id, song);
+    songMap.set(song.id, song);
 };
 
 var isAudiofile = function (path) {
