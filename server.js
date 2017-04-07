@@ -8,12 +8,18 @@
 //Todo: Playlists
 
 
-var player = require("play-sound")({"player" : "./mpg123/mpg123.exe"});
+var player = require("./Player.js");
 console.log("Player Imported");
 
+for(i = 0; i< 3; i++){
+    console.log("Z: "+i);
+}
 
 var songbase = require("./Songbase.js");
-
+songbase.load();
+songbase.checkNewSongs();
+//songbase.save();
+console.log(songbase.getSongList());
 
 var express = require('express');
 var http = require('http').Server(app);
@@ -25,6 +31,7 @@ var morgan = require('morgan');
 app.use(morgan('dev'));
 // End debug
 
+/*
 app.get('/api/play/:id',function (req, res) {
     player.play('./app/TheComplex.mp3', function(err){
         if (err){
@@ -35,9 +42,23 @@ app.get('/api/play/:id',function (req, res) {
     });
     res.send("Ok");
 });
+*/
+
+app.get('/songlist.json',function (req, res) {
+    res.send(songbase.getSongList());
+});
+
+app.get('/api/v01/getCurrentSong',function (req, res) {
+    res.send(player.getCurrentSong());
+});
+
+
 app.use('/', express.static('app'));
 
-
+var playSong = function (song) {
+    player.addSong(song);
+    console.log("Song added to now playing: "+song.title);
+};
 
  var server = app.listen(8000, function(){
  console.log("Express server listening on port %d ", server.address().port);
@@ -45,24 +66,21 @@ app.use('/', express.static('app'));
 
 var io = require('socket.io')(server);
 
+player.setNextSongCallback(function (song) {
+    io.emit('nowPlaying',song);
+});
+
 io.on('connection', function(socket){
-    socket.on('command:play', function(songID){
+    socket.on('command:addToQueue', function(songID){
 
         // Todo: funktion getSong(songID) um song zu bekommen
-        var song = {"title":""};
-        switch (songID){
-            case 0:
-             song.title = "test title";
-            break;
-            case 1:
-             song.title = "Song 2";
-             break;
-            case 2:
-             song.title ="Song 3";
-             break;
-        }
-        console.log('Play Song ' + songID+ ': '+song.title);
-        io.emit('nowPlaying',song.title.toString());
+        var song = songbase.getSongByID(songID);
+       // console.log('Play Song ' + songID+ ': '+song.title);
+        playSong(song);
     });
     console.log('a user connected');
 });
+
+
+
+

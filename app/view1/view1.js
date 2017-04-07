@@ -2,55 +2,89 @@
 
 angular.module('myApp.view1', ['ngRoute'])
 
-.config(['$routeProvider', function($routeProvider) {
-  $routeProvider.when('/view1', {
-    templateUrl: 'view1/view1.html',
-    controller: 'View1Ctrl'
-  });
-}])
+    .config(['$routeProvider', function ($routeProvider) {
+        $routeProvider.when('/view1', {
+            templateUrl: 'view1/view1.html',
+            controller: 'View1Ctrl'
+        });
+    }])
 
-.controller('View1Ctrl', ['$scope','$http', '$filter', function(scope, http, filter) {
-    var song1 = new Song(0,"test title","test interpret","test album",new SongImage(0,"http://kingofwallpapers.com/song/song-010.jpg","https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcR8x47T7Nr_A7F_tos3oKOB3K4DwzFD7ZcKizWmLMPIikNB56in4g"),null);
-    var song2 = new Song(1,"Song 2","zweiter interpret","zweites album",new SongImage(1,null,null),null);
-    var song3 = new Song(2,"Song 3","zweiter interpret","zweites album",new SongImage(2,"http://kingofwallpapers.com/song/song-001.jpg","https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcT8_SonIBak5_M_5V-IN6MSA2YRJR78X7pvw4hyVYioVwRKtaU-ew"),null);
-  scope.allSongs = [song1,song2,song3];
-  scope.playSong = function (id) {
-   // alert("Play Song "+id+"\nFunktion nicht implementiert!");
-      // Todo: Server kommunikation
-      socket.emit("command:play",id);
-  };
-  //Socket io
-  var socket = io();
-  scope.playingSong = {"title" : "None"};
-  socket.on('nowPlaying', function (data) {
-    console.log("data "+data);
-    scope.playingSong.title = data;
-    // Aenderungen im Modell aktualisieren
-    scope.$apply()
-  });
-  // Filter fuer die Songsuche
-  scope.filteredSongs = filter('filter')(scope.allSongs, scope.queryInput);
-  scope.selectedFilter="all";
-  scope.changeFilter = function () {
+    .controller('View1Ctrl', ['$scope', '$http', '$filter','$interval', function (scope, http, filter,interval) {
+        /*
+         var song1 = new Song(0,"test title","test interpret","test album",new SongImage(0,"http://kingofwallpapers.com/song/song-010.jpg","https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcR8x47T7Nr_A7F_tos3oKOB3K4DwzFD7ZcKizWmLMPIikNB56in4g"),null);
+         var song2 = new Song(1,"Song 2","zweiter interpret","zweites album",new SongImage(1,null,null),null);
+         var song3 = new Song(2,"Song 3","zweiter interpret","zweites album",new SongImage(2,"http://kingofwallpapers.com/song/song-001.jpg","https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcT8_SonIBak5_M_5V-IN6MSA2YRJR78X7pvw4hyVYioVwRKtaU-ew"),null);
+         scope.allSongs = [song1,song2,song3];
+         */
+        // Songlist vom Server holen
+        http.get('songlist.json').success(function (data) {
+            scope.allSongs = data;
+            scope.changeFilter();
+            // scope.$apply();
+        });
+        scope.addSongToQueue = function (id) {
+            // alert("Play Song "+id+"\nFunktion nicht implementiert!");
+            // Todo: Server kommunikation
+            socket.emit("command:addToQueue", id);
+        };
+        //Socket io
+        var socket = io();
+        http.get("api/v01/getCurrentSong").success(function (data) {
+            changeCurrentSong(data);
+        });
+        var countdownCtrl;
+        var changeCurrentSong = function (data) {
+            if (data) {
+                scope.playingSong = data;
+                countdownCtrl = interval(function () {
+                    var distance = scope.playingSong.endTime - new Date().getTime();
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    minutes = ("00" + minutes).substr(-2,2);
+                    seconds = ("00" + seconds).substr(-2,2);
+                    scope.timeLeft = {
+                        "min": minutes,
+                        "sec": seconds
+                    };
+                    // console.log("min "+minutes+" sec "+seconds);
+                }, 1000);
 
-      var songFilterFunction = function(song) {
+            } else {
+                scope.playingSong = {"title": "none"};
+                interval.cancel(countdownCtrl);
+                scope.timeLeft = null;
+            }
+            scope.changeFilter();
 
-          switch(scope.selectedFilter){
-              case "all":
-                  return song.title.indexOf(scope.queryInput || '') !== -1 || song.artist.indexOf(scope.queryInput || '') !== -1 || song.album.indexOf(scope.queryInput || '') !== -1;
-                  break;
-              case "title":
-                  return song.title.indexOf(scope.queryInput || '') !== -1;
-                  break;
-              case "album":
-                  return song.album.indexOf(scope.queryInput || '') !== -1;
-                  break;
-              case "artist":
-                  return song.artist.indexOf(scope.queryInput || '') !== -1;
-                  break;
-          }
-      };
+        };
 
-      scope.filteredSongs = filter('filter')(scope.allSongs, songFilterFunction,  scope.queryInput);
-  }
-}]);
+        socket.on('nowPlaying', function (data) {
+            console.log("data " + data);
+            changeCurrentSong(data);
+        });
+        // Filter fuer die Songsuche
+        scope.filteredSongs = filter('filter')(scope.allSongs, scope.queryInput);
+        scope.selectedFilter = "all";
+        scope.changeFilter = function () {
+
+            var songFilterFunction = function (song) {
+
+                switch (scope.selectedFilter) {
+                    case "all":
+                        return song.title.indexOf(scope.queryInput || '') !== -1 || song.artist.indexOf(scope.queryInput || '') !== -1 || song.album.indexOf(scope.queryInput || '') !== -1;
+                        break;
+                    case "title":
+                        return song.title.indexOf(scope.queryInput || '') !== -1;
+                        break;
+                    case "album":
+                        return song.album.indexOf(scope.queryInput || '') !== -1;
+                        break;
+                    case "artist":
+                        return song.artist.indexOf(scope.queryInput || '') !== -1;
+                        break;
+                }
+            };
+
+            scope.filteredSongs = filter('filter')(scope.allSongs, songFilterFunction, scope.queryInput);
+        }
+    }]);
