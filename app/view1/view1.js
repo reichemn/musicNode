@@ -38,6 +38,11 @@ angular.module('myApp.view1', ['ngRoute'])
                 scope.playingSong = data;
                 countdownCtrl = interval(function () {
                     var distance = scope.playingSong.endTime - new Date().getTime();
+                    if(distance < 0){
+                        interval.cancel(countdownCtrl);
+                        scope.timeLeft = null;
+                        return;
+                    }
                     var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     var seconds = Math.floor((distance % (1000 * 60)) / 1000);
                     minutes = ("00" + minutes).substr(-2,2);

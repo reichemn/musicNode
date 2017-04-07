@@ -12,6 +12,10 @@ var currentSong = null;
 var nextSongCallback = function (song) {
 };
 
+var getQueue = function () {
+    return songQueue;
+}
+
 var addSong = function (song) {
     songQueue.push(song);
     //   paused = false;
@@ -72,6 +76,7 @@ var play = function (song) {
     setTimeout(function () {
         player.kill();
         player = null;
+        currentSong = null;
         tick();
     }, (song.duration + 1) * 1000);
 };
@@ -81,5 +86,6 @@ module.exports = {
     "setNextSongCallback": setNextSongCallback,
     "pause": pause,
     "resume": resume,
-    "getCurrentSong":getCurrentSong
+    "getCurrentSong":getCurrentSong,
+    "getQueue":getQueue
 };
