@@ -1,4 +1,4 @@
-<p>Now Playing: {{playingSong.title}}, Time left: {{timeLeft.min}}:{{timeLeft.sec}}</p>
+<p>Now Playing: {{playingSong.title}}<span ng-show="(playingSong.title != 'none')">, Time left: {{timeLeft.min}}:{{timeLeft.sec}}</span></p>
 <p>All Songs</p>
 Search:<input ng-model="queryInput" ng-change=changeFilter() type="text"/>
 <form name="querySelect" >

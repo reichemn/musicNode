@@ -36,6 +36,7 @@ var removeSongFromQueue = function (id) {
     for (var i = 0; i < songQueue.length; i++) {
         if (songQueue[i].queueID === id) {
             songQueue.splice(i, 1);
+            queueChangeCallback(getQueue());
             return true;
         }
     }

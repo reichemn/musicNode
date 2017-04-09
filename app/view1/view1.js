@@ -28,38 +28,40 @@ angular.module('myApp.view1', ['ngRoute'])
         //Socket io
         var socket = io();
         http.get("api/v01/getCurrentSong").success(function (data) {
-            changeCurrentSong(data);
+            scope.changeCurrentSong(data);
         });
         scope.timeLeft = {
             "min": "",
             "sec": ""
         };
         var countdownCtrl;
-        var changeCurrentSong = function (data) {
+        scope.changeCurrentSong = function (data) {
             if (data && data != null) {
                 scope.playingSong = data;
-                countdownCtrl = interval(function () {
-                    var distance = scope.playingSong.endTime - new Date().getTime();
-                    if (distance < 0) {
+                if(data.endTime) {
+                    countdownCtrl = interval(function () {
+                        var distance = scope.playingSong.endTime - new Date().getTime();
+                        if (distance < -1) {
+                            scope.timeLeft = {
+                                "min": "",
+                                "sec": ""
+                            };
+                            scope.changeCurrentSong(null);
+                            interval.cancel(countdownCtrl);
+                           // scope.playingSong = {"title": "none"};
+                            return;
+                        }
+                        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                        minutes = ("00" + minutes).substr(-2, 2);
+                        seconds = ("00" + seconds).substr(-2, 2);
                         scope.timeLeft = {
-                            "min": "",
-                            "sec": ""
+                            "min": minutes,
+                            "sec": seconds
                         };
-                        interval.cancel(countdownCtrl);
-                        scope.playingSong = {"title": "none"};
-                        scope.changeFilter();
-                        return;
-                    }
-                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                    minutes = ("00" + minutes).substr(-2, 2);
-                    seconds = ("00" + seconds).substr(-2, 2);
-                    scope.timeLeft = {
-                        "min": minutes,
-                        "sec": seconds
-                    };
-                    // console.log("min "+minutes+" sec "+seconds);
-                }, 1000);
+                        // console.log("min "+minutes+" sec "+seconds);
+                    }, 1000);
+                }
 
             } else {
                 scope.playingSong = {"title": "none"};
@@ -68,14 +70,17 @@ angular.module('myApp.view1', ['ngRoute'])
                     "min": "",
                     "sec": ""
                 };
+                if(!scope.$$phase) {
+                    scope.$apply();
+                }
             }
-            scope.changeFilter();
+           // scope.changeFilter();
 
         };
 
         socket.on('nowPlaying', function (data) {
             console.log("data " + data);
-            changeCurrentSong(data);
+            scope.changeCurrentSong(data);
         });
         // Filter fuer die Songsuche
         scope.filteredSongs = filter('filter')(scope.allSongs, scope.queryInput);
