@@ -76,7 +76,7 @@ player.setNextSongCallback(function (song) {
 });
 
 player.setQueueChangeCallback(function (queue) {
-    console.log(queue);
+  //  console.log(queue);
     io.emit('event:songQueueChanged',queue);
 });
 
