@@ -9,7 +9,7 @@ angular.module('myApp.view1', ['ngRoute'])
         });
     }])
 
-    .controller('View1Ctrl', ['$scope', '$http', '$filter','$interval', function (scope, http, filter,interval) {
+    .controller('View1Ctrl', ['$scope', '$http', '$filter', '$interval', function (scope, http, filter, interval) {
         /*
          var song1 = new Song(0,"test title","test interpret","test album",new SongImage(0,"http://kingofwallpapers.com/song/song-010.jpg","https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcR8x47T7Nr_A7F_tos3oKOB3K4DwzFD7ZcKizWmLMPIikNB56in4g"),null);
          var song2 = new Song(1,"Song 2","zweiter interpret","zweites album",new SongImage(1,null,null),null);
@@ -23,8 +23,6 @@ angular.module('myApp.view1', ['ngRoute'])
             // scope.$apply();
         });
         scope.addSongToQueue = function (id) {
-            // alert("Play Song "+id+"\nFunktion nicht implementiert!");
-            // Todo: Server kommunikation
             socket.emit("command:addToQueue", id);
         };
         //Socket io
@@ -32,21 +30,30 @@ angular.module('myApp.view1', ['ngRoute'])
         http.get("api/v01/getCurrentSong").success(function (data) {
             changeCurrentSong(data);
         });
+        scope.timeLeft = {
+            "min": "",
+            "sec": ""
+        };
         var countdownCtrl;
         var changeCurrentSong = function (data) {
-            if (data) {
+            if (data && data != null) {
                 scope.playingSong = data;
                 countdownCtrl = interval(function () {
                     var distance = scope.playingSong.endTime - new Date().getTime();
-                    if(distance < 0){
+                    if (distance < 0) {
+                        scope.timeLeft = {
+                            "min": "",
+                            "sec": ""
+                        };
                         interval.cancel(countdownCtrl);
-                        scope.timeLeft = null;
+                        scope.playingSong = {"title": "none"};
+                        scope.changeFilter();
                         return;
                     }
                     var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                    minutes = ("00" + minutes).substr(-2,2);
-                    seconds = ("00" + seconds).substr(-2,2);
+                    minutes = ("00" + minutes).substr(-2, 2);
+                    seconds = ("00" + seconds).substr(-2, 2);
                     scope.timeLeft = {
                         "min": minutes,
                         "sec": seconds
@@ -57,7 +64,10 @@ angular.module('myApp.view1', ['ngRoute'])
             } else {
                 scope.playingSong = {"title": "none"};
                 interval.cancel(countdownCtrl);
-                scope.timeLeft = null;
+                scope.timeLeft = {
+                    "min": "",
+                    "sec": ""
+                };
             }
             scope.changeFilter();
 

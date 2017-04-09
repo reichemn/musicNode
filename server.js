@@ -2,8 +2,8 @@
  * Created by Anwender on 05.04.2017.
  */
 
-
-//Todo: Songverwaltung
+//Todo: Song hochladen koennen
+//Todo: Songinfos editieren koennen
 //Todo: Now Playing sollte im Menue angezeigt werden, nicht in der aktuellen view
 //Todo: Playlists
 
@@ -48,6 +48,11 @@ app.get('/songlist.json',function (req, res) {
     res.send(songbase.getSongList());
 });
 
+app.get('/api/v01/getSongQueue',function (req, res) {
+    console.log(player.getQueue());
+    res.send(player.getQueue());
+});
+
 app.get('/api/v01/getCurrentSong',function (req, res) {
     res.send(player.getCurrentSong());
 });
@@ -56,8 +61,8 @@ app.get('/api/v01/getCurrentSong',function (req, res) {
 app.use('/', express.static('app'));
 
 var playSong = function (song) {
+    console.log("Add Song to now playing: "+song.title);
     player.addSong(song);
-    console.log("Song added to now playing: "+song.title);
 };
 
  var server = app.listen(8000, function(){
@@ -70,13 +75,23 @@ player.setNextSongCallback(function (song) {
     io.emit('nowPlaying',song);
 });
 
+player.setQueueChangeCallback(function (queue) {
+    console.log(queue);
+    io.emit('event:songQueueChanged',queue);
+});
+
 io.on('connection', function(socket){
     socket.on('command:addToQueue', function(songID){
-
-        // Todo: funktion getSong(songID) um song zu bekommen
         var song = songbase.getSongByID(songID);
        // console.log('Play Song ' + songID+ ': '+song.title);
         playSong(song);
+    });
+    socket.on('command:removeFromQueue', function(queueID){
+        console.log("remove from queue: "+queueID);
+       player.removeSongFromQueue(queueID);
+    });
+    socket.on('disconnect', function() {
+        console.log('user disconnected!');
     });
     console.log('a user connected');
 });

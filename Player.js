@@ -9,15 +9,44 @@ var playing = false;
 var player = null;
 var paused = false;
 var currentSong = null;
+// queueID ist forlaufende Nummer um Songs innerhalb der Queue eindeutig zu identifizieren
+var queueID = 0;
+var currentSongTimeout;
+var killFlag = false;
 var nextSongCallback = function (song) {
 };
+var queueChangeCallback = function (queue) {
 
-var getQueue = function () {
-    return songQueue;
 }
 
+var getQueue = function () {
+    // Aktuell spielender Song wird an erster Stelle des zurueckgebenen Arrays angefuegt
+    var currentSongArray = [];
+    if (currentSong != null) {
+        currentSongArray.push(currentSong);
+    }
+    return currentSongArray.concat(songQueue);
+};
+
+var removeSongFromQueue = function (id) {
+    if (currentSong != null && currentSong.queueID == id) {
+        stop();
+        return true;
+    }
+    for (var i = 0; i < songQueue.length; i++) {
+        if (songQueue[i].queueID === id) {
+            songQueue.splice(i, 1);
+            return true;
+        }
+    }
+    return false;
+};
+
 var addSong = function (song) {
+    song.queueID = queueID;
+    queueID++;
     songQueue.push(song);
+    queueChangeCallback(getQueue());
     //   paused = false;
     tick();
 };
@@ -28,7 +57,7 @@ var setNextSongCallback = function (callback) {
 
 var pause = function () {
     if (player != null) {
-        player.kill();
+        killPlayer();
         player = null;
     }
     paused = true;
@@ -46,9 +75,10 @@ var getCurrentSong = function () {
 var tick = function () {
     if (player == null && !paused) {
         var naechsterSong = songQueue.shift();
-        if (naechsterSong) {
+        if (naechsterSong!=null) {
             play(naechsterSong);
         }
+        queueChangeCallback(getQueue());
         nextSongCallback(naechsterSong);
     } else if (player == null) {
         currentSong = null;
@@ -57,28 +87,70 @@ var tick = function () {
 
 var play = function (song) {
     if (player != null) {
-        player.kill();
+        stop();
     }
     // Hier Moeglichkeiten fuer andere datenquellen
     if (song.source.type === "local") {
         console.log('Play Song ' + song.id + ': ' + song.title);
         player = audioPlayer.play(song.source.path, function (err) {
             if (err) {
-                console.log("Error");
-                player = null;
-                tick();
+                console.log("Player Error: " + err);
+                //player.kill();
+                //player = null;
+                //tick();
+            } else {
+                console.log("song fertig");
             }
+
+            if (currentSongTimeout != null) {
+                clearTimeout(currentSongTimeout);
+            }
+            if (player != null) {
+                console.log("kill " + currentSong.title);
+                player.kill();
+                player = null;
+
+            }
+            currentSong = null
+
+            tick();
 
         });
     }
     currentSong = song;
     currentSong.endTime = new Date().getTime() + (song.duration + 1) * 1000;
-    setTimeout(function () {
+    // currentSongTimeout = setTimeout(function () {
+    //     if (currentSongTimeout != null) {
+    //         clearTimeout(currentSongTimeout);
+    //     }
+    //     if (player != null) {
+    //         console.log("kill " + currentSong.title);
+    //         player.kill();
+    //         player = null;
+    //
+    //     }
+    //     currentSong = null;
+    //     tick();
+    // }, (song.duration + 1) * 1000);
+};
+
+var setQueueChangeCallback = function (callback) {
+    queueChangeCallback = callback;
+}
+
+var getKillFlag = function () {
+    return killFlag;
+}
+
+var stop = function () {
+    if (player != null) {
+        console.log("kill " + currentSong.title);
         player.kill();
         player = null;
-        currentSong = null;
-        tick();
-    }, (song.duration + 1) * 1000);
+
+    }
+    currentSong = null;
+    //tick();
 };
 
 module.exports = {
@@ -86,6 +158,8 @@ module.exports = {
     "setNextSongCallback": setNextSongCallback,
     "pause": pause,
     "resume": resume,
-    "getCurrentSong":getCurrentSong,
-    "getQueue":getQueue
+    "getCurrentSong": getCurrentSong,
+    "getQueue": getQueue,
+    "removeSongFromQueue": removeSongFromQueue,
+    "setQueueChangeCallback":setQueueChangeCallback
 };

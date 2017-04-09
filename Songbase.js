@@ -182,7 +182,6 @@ var replaceSong = function (song) {
 };
 
 var isAudiofile = function (filePath) {
-    // Todo: teste ob dateiendung stimmt
     var extension = path.extname(filePath);
     for (var i = 0; i < audioFileExtensions.length; i++) {
         if (audioFileExtensions[i] === extension) {
