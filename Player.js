@@ -123,7 +123,7 @@ var play = function (song) {
         });
     }
     currentSong = song;
-    currentSong.endTime = new Date().getTime() + (song.duration + 1) * 1000;
+    currentSong.endTime = new Date().getTime() + (song.duration ) * 1000;
     // currentSongTimeout = setTimeout(function () {
     //     if (currentSongTimeout != null) {
     //         clearTimeout(currentSongTimeout);

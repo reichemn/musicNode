@@ -32,7 +32,14 @@
     "update-index-async": "node -e \"var fs=require('fs'),indexFile='app/index-async.html',loaderFile='app/bower_components/angular-loader/angular-loader.min.js',loaderText=fs.readFileSync(loaderFile,'utf-8').split(/sourceMappingURL=angular-loader.min.js.map/).join('sourceMappingURL=bower_components/angular-loader/angular-loader.min.js.map'),indexText=fs.readFileSync(indexFile,'utf-8').split(/\\/\\/@@NG_LOADER_START@@[\\s\\S]*\\/\\/@@NG_LOADER_END@@/).join('//@@NG_LOADER_START@@\\n'+loaderText+'    //@@NG_LOADER_END@@');fs.writeFileSync(indexFile,indexText);\""
   },
   "dependencies": {
+    "express": "^4.15.2",
+    "hashmap": "^2.1.0",
+    "http": "0.0.0",
     "jsonfile": "^2.4.0",
-    "md5-file": "^3.1.1"
+    "md5-file": "^3.1.1",
+    "morgan": "^1.8.1",
+    "musicmetadata": "^2.0.5",
+    "play-sound": "^1.1.1",
+    "socket.io": "^1.7.3"
   }
 }
