@@ -43,6 +43,7 @@ angular.module('myApp.view1', ['ngRoute'])
                         var distance = scope.playingSong.endTime - new Date().getTime();
                         if (distance < -1) {
                             scope.timeLeft = {
+                                "percent": 0,
                                 "min": "",
                                 "sec": ""
                             };
@@ -56,6 +57,7 @@ angular.module('myApp.view1', ['ngRoute'])
                         minutes = ("00" + minutes).substr(-2, 2);
                         seconds = ("00" + seconds).substr(-2, 2);
                         scope.timeLeft = {
+                            "percent": (1-(distance/scope.playingSong.duration))*100,
                             "min": minutes,
                             "sec": seconds
                         };

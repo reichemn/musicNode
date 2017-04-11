@@ -17,7 +17,7 @@ var nextSongCallback = function (song) {
 };
 var queueChangeCallback = function (queue) {
 
-}
+};
 
 var getQueue = function () {
     // Aktuell spielender Song wird an erster Stelle des zurueckgebenen Arrays angefuegt
@@ -52,13 +52,17 @@ var addSong = function (song) {
     tick();
 };
 
+/**
+ *
+ * @param callback  Funktion wird aufgerufen wenn die Wiedergabe startet
+ */
 var setNextSongCallback = function (callback) {
     nextSongCallback = callback;
 };
 
 var pause = function () {
     if (player != null) {
-        killPlayer();
+        stop();
         player = null;
     }
     paused = true;
@@ -135,13 +139,14 @@ var play = function (song) {
     // }, (song.duration + 1) * 1000);
 };
 
+/**
+ *
+ * @param callback wird aufgerufen wenn sich die songQueue veraendert
+ */
 var setQueueChangeCallback = function (callback) {
     queueChangeCallback = callback;
 }
 
-var getKillFlag = function () {
-    return killFlag;
-}
 
 var stop = function () {
     if (player != null) {

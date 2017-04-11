@@ -11,10 +11,6 @@
 var player = require("./Player.js");
 console.log("Player Imported");
 
-for (i = 0; i < 3; i++) {
-    console.log("Z: " + i);
-}
-
 var songbase = require("./Songbase.js");
 songbase.load();
 songbase.checkNewSongs();

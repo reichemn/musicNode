@@ -16,6 +16,7 @@ var SongClass = require("./app/scripts/Song.js");
 var playlistList = [];
 var songMap = new HashMap();
 var load = function () {
+    // Todo: ./songbase und ./songbase/import ./songbase/songs erstellen falls nicht vorhanden
     try {
         var obj = jsonfile.readFileSync(file);
         console.dir(obj);
@@ -123,6 +124,15 @@ importSong = function (songPath) {
     var fileStream = fs.createReadStream(songPath);
     var parser = mm(fileStream,{ duration: true }, function (err, tags) {
         if (err) throw err;
+        if(tags.picture){
+        //Todo: Bilder extrahieren
+        //Todo: Thumbnail erzeugung
+            if(tags.picture[0].format === "jpg"||tags.picture[0].format === "jpeg"){
+
+            }else if(tags.picture[0].format === "png"){
+
+            }
+        }
         fileStream.close();
         console.log(tags);
         song.title = tags.title || splitedSongPath[splitedSongPath.length-1];
@@ -130,7 +140,9 @@ importSong = function (songPath) {
         song.album = tags.album || "";
         song.duration = tags.duration || null;
         console.log("id: " + song.id + ", Title: " + song.title + ", Album: " + song.album + ", Artist: " + song.artist + ", Lange: "+song.duration);
+
         fs.renameSync(songPath, newSongPath);
+
         addSong(song);
     });
 /*
@@ -142,8 +154,7 @@ importSong = function (songPath) {
 
     console.log("id: " + song.id + ", Title: " + song.title + ", Album: " + song.album + ", Artist: " + song.artist);
 */
-    //Todo: Bilder extrahieren
-    //Todo: Thumbnail erzeugung
+
     /*
     if(tags.image){
         var imagePath = newSongPath+"."+tags.image.mime;
