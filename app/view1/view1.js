@@ -43,7 +43,7 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute'])
                         var distance = scope.playingSong.endTime - new Date().getTime();
                         if (distance < -1) {
                             scope.timeLeft = {
-                                "percent": 0,
+                                "percent": 100,
                                 "min": "",
                                 "sec": ""
                             };
@@ -62,7 +62,7 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute'])
                             "sec": seconds
                         };
                         // console.log("min "+minutes+" sec "+seconds);
-                    }, 1000);
+                    }, 500);
                 }
 
             } else {
