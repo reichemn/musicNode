@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.view1', ['ngRoute'])
+angular.module('myApp.view1', ['ngMaterial','ngRoute'])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/view1', {
@@ -57,7 +57,7 @@ angular.module('myApp.view1', ['ngRoute'])
                         minutes = ("00" + minutes).substr(-2, 2);
                         seconds = ("00" + seconds).substr(-2, 2);
                         scope.timeLeft = {
-                            "percent": (1-(distance/scope.playingSong.duration))*100,
+                            "percent": ((1-((distance/1000)/scope.playingSong.duration))*100),
                             "min": minutes,
                             "sec": seconds
                         };
