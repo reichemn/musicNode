@@ -1,5 +1,5 @@
 <p>Now Playing: {{playingSong.title}}<span ng-show="(playingSong.title != 'none')">, Time left: {{timeLeft.min}}:{{timeLeft.sec}}
-<md-progress-linear md-mode="determinate" value="{{timeLeft.percent}}"></md-progress-linear></span></p>
+<md-progress-linear style="padding-top: 10px; margin-bottom: 20px;" md-mode="determinate" value="{{timeLeft.percent}}"></md-progress-linear></span></p>
 <p>All Songs</p>
 Search:<input ng-model="queryInput" ng-change=changeFilter() type="text"/>
 <form name="querySelect" >

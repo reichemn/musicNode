@@ -127,11 +127,13 @@ importSong = function (songPath) {
         if(tags.picture){
         //Todo: Bilder extrahieren
         //Todo: Thumbnail erzeugung
+            /*
             if(tags.picture[0].format === "jpg"||tags.picture[0].format === "jpeg"){
 
             }else if(tags.picture[0].format === "png"){
 
             }
+            */
         }
         fileStream.close();
         console.log(tags);
