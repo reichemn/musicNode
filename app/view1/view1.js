@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.view1', ['ngMaterial','ngRoute'])
+angular.module('myApp.view1', ['ngMaterial','ngRoute','ngNotify'])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/view1', {
@@ -9,7 +9,7 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute'])
         });
     }])
 
-    .controller('View1Ctrl', ['$scope', '$http', '$filter', '$interval', function (scope, http, filter, interval) {
+    .controller('View1Ctrl', ['$scope', '$http', '$filter', '$interval','ngNotify', function (scope, http, filter, interval,ngNotify) {
         /*
          var song1 = new Song(0,"test title","test interpret","test album",new SongImage(0,"http://kingofwallpapers.com/song/song-010.jpg","https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcR8x47T7Nr_A7F_tos3oKOB3K4DwzFD7ZcKizWmLMPIikNB56in4g"),null);
          var song2 = new Song(1,"Song 2","zweiter interpret","zweites album",new SongImage(1,null,null),null);
@@ -24,6 +24,11 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute'])
         });
         scope.addSongToQueue = function (id) {
             socket.emit("command:addToQueue", id);
+            //Todo: Pruefung ob der Song wirklich der Queue hinzugefuegt wurde.
+            ngNotify.set('Song added to queue!', {
+                type: 'success',
+                    duration: 3000
+            });
         };
         //Socket io
         var socket = io();
