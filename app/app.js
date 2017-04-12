@@ -6,10 +6,10 @@
 console.log("app.js executed");
 
 angular.module('myApp', [
-  'btford.socket-io',
   'ngRoute',
   'myApp.view1',
   'myApp.view2',
+  'myApp.addSong',
   'myApp.version'
 ]).
 config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {

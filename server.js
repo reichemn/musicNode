@@ -22,10 +22,26 @@ var http = require('http').Server(app);
 
 var app = express();
 
+multiparty = require('connect-multiparty');
+var multipartyMiddleware = multiparty();
+
+
+
+
+
 // For debug
 var morgan = require('morgan');
 app.use(morgan('dev'));
+
+var logger =require('morgan-body');
+
+var bodyParser =require('body-parser');
+app.use(bodyParser.json());
+
+// hook logger to express app
+logger(app);
 // End debug
+
 
 /*
  app.get('/api/play/:id',function (req, res) {
@@ -39,10 +55,18 @@ app.use(morgan('dev'));
  res.send("Ok");
  });
  */
+app.post('/songUpload', multipartyMiddleware, function(req, res) {
+    // We are able to access req.files.file thanks to
+    // the multiparty middleware
+    var file = req.files.file;
+    console.log(file.name);
+    console.log(file.type);
+});
 
 app.get('/songlist.json', function (req, res) {
     res.send(songbase.getSongList());
 });
+
 
 app.get('/api/v01/getSongQueue', function (req, res) {
     console.log(player.getQueue());
