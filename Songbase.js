@@ -15,6 +15,23 @@ var SongClass = require("./app/scripts/Song.js");
 //var songList = [];
 var playlistList = [];
 var songMap = new HashMap();
+
+/**
+ * Initialisiert die Ordnerstruktur
+ */
+var init = function () {
+    if (!fs.existsSync("./songbase")){
+        fs.mkdirSync("./songbase");
+    }
+    if (!fs.existsSync(importFolder)){
+        fs.mkdirSync(importFolder);
+    }
+    if (!fs.existsSync("./songbase/songs")){
+        fs.mkdirSync("./songbase/songs");
+    }
+}
+init();
+
 var load = function () {
     // Todo: ./songbase und ./songbase/import ./songbase/songs erstellen falls nicht vorhanden
     try {
@@ -45,6 +62,9 @@ var getPlaylistList = function () {
     return playlistList;
 };
 
+/**
+ * Durchsucht den import Ordner nach Audiodateien und fuegt sie der Datenbank hinzu
+ */
 var checkNewSongs = function () {
     //Suche nach Audiodateien im import ordner
     walk(importFolder, function (err, results) {
@@ -60,8 +80,11 @@ var checkNewSongs = function () {
 
 };
 
-var importSong;
-importSong = function (songPath) {
+/**
+ * Importiert einen Song am angegebenen Pfad
+ * @songPath Pfad zur Datei
+ */
+var importSong = function (songPath) {
     if (!isAudiofile(songPath)) {
         return;
     }
@@ -194,6 +217,11 @@ var replaceSong = function (song) {
     songMap.set(song.id, song);
 };
 
+/**
+ * Testet ob eine Datei eine Audiodatei ist
+ * @param filePath
+ * @returns true wenn Audiofile
+ */
 var isAudiofile = function (filePath) {
     var extension = path.extname(filePath);
     for (var i = 0; i < audioFileExtensions.length; i++) {
@@ -206,6 +234,11 @@ var isAudiofile = function (filePath) {
     return false;
 };
 
+/**
+ * Durchsucht rekursiv eine Ordnerstruktur und gibt eine Liste mit Dateipfaden zurueck
+ * @param dir ornder in dem die suche gestartet werden soll
+ * @param done Array mit Dateipfaden
+ */
 var walk = function (dir, done) {
     var results = [];
     fs.readdir(dir, function (err, list) {

@@ -1,4 +1,5 @@
-[mpg123] muss unter ./mpg123/ liegen.
+~~[mpg123] muss unter ./mpg123/ liegen. Die mpg123.exe muss also unter ./mpg123/mpg123.exe zu finden sein.~~
+[mplayer] muss unter ./mplayer/ liegen. Die mplayer.exe muss also unter ./mplayer/mplayer.exe zu finden sein.
 
 # `angular-seed` — the seed for AngularJS apps
 
@@ -296,3 +297,4 @@ For more information on AngularJS please check out [angularjs.org][angularjs].
 [travis]: https://travis-ci.org/
 [travis-docs]: https://docs.travis-ci.com/user/getting-started
 [mpg123]: http://www.mpg123.de/download.shtml
+[mplayer]: http://mplayerwin.sourceforge.net/downloads.html

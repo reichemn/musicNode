@@ -67,7 +67,7 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute','ngNotify'])
                             "sec": seconds
                         };
                         // console.log("min "+minutes+" sec "+seconds);
-                    }, 500);
+                    }, 100);
                 }
 
             } else {

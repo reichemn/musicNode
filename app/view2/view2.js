@@ -9,7 +9,7 @@ angular.module('myApp.view2', ['ngRoute'])
         });
     }])
 
-    .controller('View2Ctrl', ['$scope', '$http', function (scope, http) {
+    .controller('View2Ctrl', ['$scope', '$http','ngNotify', function (scope, http, ngNotify) {
         http.get('api/v01/getSongQueue').success(function (data) {
             scope.changeQueue(data);
             //scope.$apply();
@@ -20,6 +20,11 @@ angular.module('myApp.view2', ['ngRoute'])
         var socket = io();
         scope.removeFromQueue = function (id) {
             socket.emit("command:removeFromQueue", id);
+            //Todo: pruefung ob Song wirklich entfernt wurde
+            ngNotify.set('Song removed from queue!', {
+                type: 'success',
+                duration: 3000
+            });
         };
         socket.on('event:songQueueChanged', function (data) {
             console.log("queue " + data);

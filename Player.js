@@ -2,7 +2,8 @@
  * Created by Anwender on 07.04.2017.
  */
 
-var audioPlayer = require("play-sound")({"player": "./mpg123/mpg123.exe"});
+//var audioPlayer = require("play-sound")({"player": "./mpg123/mpg123.exe"});
+var audioPlayer = require("play-sound")({"player": "./mplayer/mplayer.exe"});
 
 var songQueue = [];
 var playing = false;
@@ -18,6 +19,7 @@ var nextSongCallback = function (song) {
 var queueChangeCallback = function (queue) {
 
 };
+
 
 var getQueue = function () {
     // Aktuell spielender Song wird an erster Stelle des zurueckgebenen Arrays angefuegt
@@ -77,6 +79,9 @@ var getCurrentSong = function () {
     return currentSong;
 };
 
+/**
+ * Prueft ob ob aktuell ein Song laeuft und ob startet ggf. den naechsten Song
+ */
 var tick = function () {
     if (player == null && !paused) {
         var naechsterSong = songQueue.shift();
@@ -90,6 +95,7 @@ var tick = function () {
     }
 };
 
+
 var play = function (song) {
     if (player != null) {
         stop();
@@ -97,7 +103,7 @@ var play = function (song) {
     // Hier Moeglichkeiten fuer andere datenquellen
     if (song.source.type === "local") {
         console.log('Play Song ' + song.id + ': ' + song.title);
-        player = audioPlayer.play(song.source.path, function (err) {
+        player = audioPlayer.play(song.source.path,{"./mplayer/mplayer.exe":['-really-quiet']}, function (err) {
             if (err) {
                 console.log("Player Error: " + err);
                 //player.kill();
@@ -147,7 +153,9 @@ var setQueueChangeCallback = function (callback) {
     queueChangeCallback = callback;
 }
 
-
+/**
+ * Stopt die aktuelle Wiedergabe
+ */
 var stop = function () {
     if (player != null) {
         console.log("kill " + currentSong.title);
