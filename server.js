@@ -50,7 +50,7 @@ app.post('/songUpload', upload.single('song'), function (req, res, next) {
     // req.file is the `avatar` file
     // req.body will hold the text fields, if there were any
     console.log("upload: "+req.file.originalname);
-    songbase.addUploadedSong(req.file.path, req.file.originalname);
+    songbase.importUploadedSong(req.file.path, req.file.originalname);
     res.send("ok");
 
 })

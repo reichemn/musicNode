@@ -1,6 +1,7 @@
 /**
  * Created by Anwender on 05.04.2017.
  */
+'use strict';
 
 const importFolder = "./songbase/import";
 const audioFileExtensions = [".mp3", ".aac"];
@@ -80,12 +81,14 @@ var checkNewSongs = function () {
 
 };
 
-var addUploadedSong = function (filePath, originalname) {
+var importUploadedSong = function (filePath, originalname) {
     var newPath = path.join(importFolder, originalname);
-    console.log("add uploaded song: " + newPath);
+    console.log("import uploaded song: " + newPath);
     fs.rename(filePath, newPath, function (err) {
         if (!err) {
-            addSong(newPath);
+            importSong(newPath);
+        }else {
+            console.log("Error move uploaded Song: "+err);
         }
     });
 };
@@ -281,6 +284,6 @@ module.exports = {
     "checkNewSongs": checkNewSongs,
     "getSongByID": getSongByID,
     "replaceSong": replaceSong,
-    "addUploadedSong":addUploadedSong
+    "importUploadedSong":importUploadedSong
 
 };

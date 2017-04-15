@@ -3,7 +3,7 @@
  */
 'use strict';
 
-angular.module('myApp.addSong', ['ngRoute','ngNotify','ngFileUpload'])
+angular.module('myApp.addSong', ['ngRoute', 'ngNotify'])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/addSong', {
@@ -12,33 +12,46 @@ angular.module('myApp.addSong', ['ngRoute','ngNotify','ngFileUpload'])
         });
     }])
 
-    .controller('addSongCtrl', ['$scope', '$http','ngNotify','Upload', function ($scope, http,ngNotify,Upload) {
+    .controller('addSongCtrl', ['$scope', '$http', 'ngNotify', function (scope, http, ngNotify) {
 
-        $scope.uploadPic = function (file) {
-            $scope.formUpload = true;
-            if (file != null) {
-                $scope.upload(file);
+        var selectedSong = null;
+        scope.songValid = false;
+        scope.setSong = function (element) {
+            selectedSong = element.files[0];
+            console.log(selectedSong);
+            if (selectedSong != null) {
+                scope.$apply(function () {
+                    scope.songValid = true;
+                })
+
+            }else{
+                scope.$apply(function () {
+                    scope.songValid = false;
+                })
             }
         };
 
-        $scope.upload = function (file, resumable) {
-            $scope.errorMsg = null;
 
-            //    uploadUsing$http(file);
-            $scope.uploadFile(file);
-
+        scope.startUpload = function () {
+            if (selectedSong != null) {
+                scope.uploadFile(selectedSong);
+            }
         };
 
-        $scope.setProgress = function (value) {
-            $scope.picFile.progress = value;
+        scope.songUpload = {
+            "result": null,
+            "progress" : -1
+        }
+
+        scope.setProgress = function (value) {
+            scope.songUpload.progress = value;
         };
 
         var client = null;
 
-        $scope.uploadFile = function uploadFile(file)
-        {
+        scope.uploadFile = function uploadFile(file) {
             //Wieder unser File Objekt
-           // var file = document.getElementById("fileA").files[0];
+            // var file = document.getElementById("fileA").files[0];
             //FormData Objekt erzeugen
             var formData = new FormData();
             //XMLHttpRequest Objekt erzeugen
@@ -46,37 +59,44 @@ angular.module('myApp.addSong', ['ngRoute','ngNotify','ngFileUpload'])
 
             //var prog = document.getElementById("progress");
 
-            if(!file)
+            if (!file)
                 return;
 
-           // prog.value = 0;
-           // prog.max = 100;
+            // prog.value = 0;
+            // prog.max = 100;
 
             //Fügt dem formData Objekt unser File Objekt hinzu
             formData.append("song", file);
 
-            client.onerror = function(e) {
-                alert("onError");
+            client.onerror = function (e) {
+                ngNotify.set('Upload fehlgeschlagen.', {
+                    type: 'error',
+                    duration: 3000
+                });
             };
 
-            client.onload = function(e) {
+            client.onload = function (e) {
                 //document.getElementById("prozent").innerHTML = "100%";
                 //prog.value = prog.max;
+                console.log(this.responseText);
                 ngNotify.set('Upload abgeschlossen.', {
                     type: 'success',
                     duration: 3000
                 });
             };
 
-            client.upload.onprogress = function(e) {
+            client.upload.onprogress = function (e) {
                 var p = Math.round(100 / e.total * e.loaded);
                 //document.getElementById("progress").value = p;
                 //document.getElementById("prozent").innerHTML = p + "%";
-                $scope.setProgress(p);
+                scope.setProgress(p);
             };
 
-            client.onabort = function(e) {
-                alert("Upload abgebrochen");
+            client.onabort = function (e) {
+                ngNotify.set('Upload abgebrochen.', {
+                    type: 'warn',
+                    duration: 3000
+                });
             };
 
             client.open("POST", "songUpload");

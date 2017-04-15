@@ -1,16 +1,13 @@
 <form name="myForm">
     <fieldset>
         <legend>Upload on form submit</legend>
-        Song: <input type="file" ngf-select="" ng-model="picFile" name="file" ngf-accept="'audio/*'" required="">
-        <i ng-show="myForm.file.$error.required">*required</i>
+        Song: <input type="file" ng-model="songFile" name="song" accept="audio/*" onchange="angular.element(this).scope().setSong(this)"  />
         <br>
-
-        <button ng-disabled="!myForm.$valid" ng-click="uploadPic(picFile)">Submit</button>
-        <img ngf-src="picFile" class="thumb">
-        <span class="progress" ng-show="picFile.progress >= 0">
-                  <div style="width:{{picFile.progress}}%" ng-bind="picFile.progress + '%'" class="ng-binding"></div>
+        <button ng-disabled="!songValid"  ng-click="startUpload()">Submit</button>
+        <span class="progress" ng-show="songUpload.progress >= 0">
+                  <div style="width:{{songUpload.progress}}%" ng-bind="songUpload.progress + '%'" class="ng-binding"></div>
               </span>
-        <span ng-show="picFile.result">Upload Successful</span>
+        <span ng-show="songUpload.result">Upload Successful</span>
     </fieldset>
     <br>
 </form>
