@@ -1,0 +1,16 @@
+<form name="myForm">
+    <fieldset>
+        <legend>Upload on form submit</legend>
+        Song: <input type="file" ng-model="songFile" name="song" accept="audio/*" onchange="angular.element(this).scope().setSong(this)"  />
+        <br>
+        <button ng-disabled="!songValid"  ng-click="startUpload()">Submit</button>
+        <span class="progress" ng-show="songUpload.progress >= 0">
+                  <div style="width:{{songUpload.progress}}%" ng-bind="songUpload.progress + '%'" class="ng-binding"></div>
+              </span>
+        <div ng-show="songUpload.result">
+            <p>Processing Song...</p>
+            <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+        </div>
+    </fieldset>
+    <br>
+</form>

@@ -1,3 +1,6 @@
+~~[mpg123] muss unter ./mpg123/ liegen. Die mpg123.exe muss also unter ./mpg123/mpg123.exe zu finden sein.~~
+[mplayer] muss unter ./mplayer/ liegen. Die mplayer.exe muss also unter ./mplayer/mplayer.exe zu finden sein.
+
 # `angular-seed` — the seed for AngularJS apps
 
 This project is an application skeleton for a typical [AngularJS][angularjs] web app. You can use it
@@ -97,7 +100,7 @@ app/                    --> all of the source files for the application
     view2.html            --> the partial template
     view2.js              --> the controller logic
     view2_test.js         --> tests of the controller
-  app.js                --> main application module
+  server.js                --> main application module
   index.html            --> app layout file (the main html template file of the app)
   index-async.html      --> just like index.html, but loads js files asynchronously
 karma.conf.js         --> config file for running unit tests with Karma
@@ -293,3 +296,5 @@ For more information on AngularJS please check out [angularjs.org][angularjs].
 [selenium]: http://docs.seleniumhq.org/
 [travis]: https://travis-ci.org/
 [travis-docs]: https://docs.travis-ci.com/user/getting-started
+[mpg123]: http://www.mpg123.de/download.shtml
+[mplayer]: http://mplayerwin.sourceforge.net/downloads.html

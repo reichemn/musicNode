@@ -1,5 +1,20 @@
-<p>This is the partial for view 2.</p>
+<p>Song Queue ({{songQueue.length}} items):</p>
 <p>
-  Showing of 'interpolate' filter:
-  {{ 'Current version is v%VERSION%.' | interpolate }}
+<hr>
+<table width="70%">
+  <tr>
+    <th>Title</th>
+    <th>Artist</th>
+    <th>Album</th>
+    <th>Image</th>
+    <th>Action</th>
+  </tr>
+  <tr ng-repeat="song in songQueue">
+    <td>{{song.title}}</td>
+    <td>{{song.artist}}</td>
+    <td>{{song.album}}</td>
+    <td><img ng-src="{{song.image.thumbnailPath}}" width="50"></td>
+    <td> <a href="" ng-click="removeFromQueue(song.queueID)">remove from Queue</a></td>
+  </tr>
+</table>
 </p>
