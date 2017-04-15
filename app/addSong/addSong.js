@@ -24,31 +24,63 @@ angular.module('myApp.addSong', ['ngRoute','ngNotify','ngFileUpload'])
         $scope.upload = function (file, resumable) {
             $scope.errorMsg = null;
 
-                uploadUsing$http(file);
+            //    uploadUsing$http(file);
+            $scope.uploadFile(file);
 
         };
 
-        function uploadUsing$http(file) {
-            file.upload = Upload.http({
-                url: '/songUpload',
-                method: 'POST',
-                headers: {
-                    'Content-Type': file.type
-                },
-                data: {file: file}
-            });
+        $scope.setProgress = function (value) {
+            $scope.picFile.progress = value;
+        };
 
-            file.upload.then(function (response) {
-                file.result = response.data;
-            }, function (response) {
-                if (response.status > 0)
-                    $scope.errorMsg = response.status + ': ' + response.data;
-            });
+        var client = null;
 
-            file.upload.progress(function (evt) {
-                file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-            });
-        }
+        $scope.uploadFile = function uploadFile(file)
+        {
+            //Wieder unser File Objekt
+           // var file = document.getElementById("fileA").files[0];
+            //FormData Objekt erzeugen
+            var formData = new FormData();
+            //XMLHttpRequest Objekt erzeugen
+            client = new XMLHttpRequest();
 
+            //var prog = document.getElementById("progress");
+
+            if(!file)
+                return;
+
+           // prog.value = 0;
+           // prog.max = 100;
+
+            //Fügt dem formData Objekt unser File Objekt hinzu
+            formData.append("song", file);
+
+            client.onerror = function(e) {
+                alert("onError");
+            };
+
+            client.onload = function(e) {
+                //document.getElementById("prozent").innerHTML = "100%";
+                //prog.value = prog.max;
+                ngNotify.set('Upload abgeschlossen.', {
+                    type: 'success',
+                    duration: 3000
+                });
+            };
+
+            client.upload.onprogress = function(e) {
+                var p = Math.round(100 / e.total * e.loaded);
+                //document.getElementById("progress").value = p;
+                //document.getElementById("prozent").innerHTML = p + "%";
+                $scope.setProgress(p);
+            };
+
+            client.onabort = function(e) {
+                alert("Upload abgebrochen");
+            };
+
+            client.open("POST", "songUpload");
+            client.send(formData);
+        };
 
     }]);

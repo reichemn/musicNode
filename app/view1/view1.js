@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.view1', ['ngMaterial','ngRoute','ngNotify'])
+angular.module('myApp.view1', ['ngMaterial', 'ngRoute', 'ngNotify'])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/view1', {
@@ -9,7 +9,7 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute','ngNotify'])
         });
     }])
 
-    .controller('View1Ctrl', ['$scope', '$http', '$filter', '$interval','ngNotify', function (scope, http, filter, interval,ngNotify) {
+    .controller('View1Ctrl', ['$scope', '$http', '$filter', '$interval', 'ngNotify', function (scope, http, filter, interval, ngNotify) {
         /*
          var song1 = new Song(0,"test title","test interpret","test album",new SongImage(0,"http://kingofwallpapers.com/song/song-010.jpg","https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcR8x47T7Nr_A7F_tos3oKOB3K4DwzFD7ZcKizWmLMPIikNB56in4g"),null);
          var song2 = new Song(1,"Song 2","zweiter interpret","zweites album",new SongImage(1,null,null),null);
@@ -27,7 +27,7 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute','ngNotify'])
             //Todo: Pruefung ob der Song wirklich der Queue hinzugefuegt wurde.
             ngNotify.set('Song added to queue!', {
                 type: 'success',
-                    duration: 3000
+                duration: 3000
             });
         };
         //Socket io
@@ -43,7 +43,7 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute','ngNotify'])
         scope.changeCurrentSong = function (data) {
             if (data && data != null) {
                 scope.playingSong = data;
-                if(data.endTime) {
+                if (data.endTime) {
                     countdownCtrl = interval(function () {
                         var distance = scope.playingSong.endTime - new Date().getTime();
                         if (distance < -1) {
@@ -54,7 +54,7 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute','ngNotify'])
                             };
                             scope.changeCurrentSong(null);
                             interval.cancel(countdownCtrl);
-                           // scope.playingSong = {"title": "none"};
+                            // scope.playingSong = {"title": "none"};
                             return;
                         }
                         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
@@ -62,7 +62,7 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute','ngNotify'])
                         minutes = ("00" + minutes).substr(-2, 2);
                         seconds = ("00" + seconds).substr(-2, 2);
                         scope.timeLeft = {
-                            "percent": ((1-((distance/1000)/scope.playingSong.duration))*100),
+                            "percent": ((1 - ((distance / 1000) / scope.playingSong.duration)) * 100),
                             "min": minutes,
                             "sec": seconds
                         };
@@ -77,14 +77,14 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute','ngNotify'])
                     "min": "",
                     "sec": ""
                 };
-                if(!scope.$$phase) {
+                if (!scope.$$phase) {
                     scope.$apply();
                 }
             }
-           // scope.changeFilter();
+            // scope.changeFilter();
 
         };
-
+        scope.queryInput = "";
         socket.on('nowPlaying', function (data) {
             console.log("data " + data);
             scope.changeCurrentSong(data);
@@ -98,16 +98,40 @@ angular.module('myApp.view1', ['ngMaterial','ngRoute','ngNotify'])
 
                 switch (scope.selectedFilter) {
                     case "all":
-                        return song.title.indexOf(scope.queryInput || '') !== -1 || song.artist.indexOf(scope.queryInput || '') !== -1 || song.album.indexOf(scope.queryInput || '') !== -1;
+                        var hasTitle = false;
+                        if (song.title) {
+                            hasTitle = song.title.indexOf(scope.queryInput || '') !== -1;
+                        }
+                        var hasArtist = false;
+                        if (song.artist) {
+                            hasArtist = song.artist.indexOf(scope.queryInput || '') !== -1;
+                        }
+                        var hasAlbum = false;
+                        if (song.album) {
+                            hasAlbum = song.album.indexOf(scope.queryInput || '') !== -1;
+                        }
+                        return hasTitle || hasArtist || hasAlbum;
                         break;
                     case "title":
-                        return song.title.indexOf(scope.queryInput || '') !== -1;
+                        var hasTitle = false;
+                        if (song.title) {
+                            hasTitle = song.title.indexOf(scope.queryInput || '') !== -1;
+                        }
+                        return hasTitle;
                         break;
                     case "album":
-                        return song.album.indexOf(scope.queryInput || '') !== -1;
+                        var hasAlbum = false;
+                        if (song.album) {
+                            hasAlbum = song.album.indexOf(scope.queryInput || '') !== -1;
+                        }
+                        return hasAlbum;
                         break;
                     case "artist":
-                        return song.artist.indexOf(scope.queryInput || '') !== -1;
+                        var hasArtist = false;
+                        if (song.artist) {
+                            hasArtist = song.artist.indexOf(scope.queryInput || '') !== -1;
+                        }
+                        return hasArtist;
                         break;
                 }
             };

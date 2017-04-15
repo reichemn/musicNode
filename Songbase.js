@@ -20,13 +20,13 @@ var songMap = new HashMap();
  * Initialisiert die Ordnerstruktur
  */
 var init = function () {
-    if (!fs.existsSync("./songbase")){
+    if (!fs.existsSync("./songbase")) {
         fs.mkdirSync("./songbase");
     }
-    if (!fs.existsSync(importFolder)){
+    if (!fs.existsSync(importFolder)) {
         fs.mkdirSync(importFolder);
     }
-    if (!fs.existsSync("./songbase/songs")){
+    if (!fs.existsSync("./songbase/songs")) {
         fs.mkdirSync("./songbase/songs");
     }
 }
@@ -40,7 +40,7 @@ var load = function () {
         songMap = new HashMap();
         songMap.copy(obj.songMap);
         playlistList = obj.playlistList;
-    }catch(err){
+    } catch (err) {
         // neue datei erstellen falls noch keine existiert
         save();
     }
@@ -70,14 +70,24 @@ var checkNewSongs = function () {
     walk(importFolder, function (err, results) {
         if (err) throw err;
         console.log(results);
-        console.log("Anzahl: "+results.length);
+        console.log("Anzahl: " + results.length);
         for (var i = 0; i < (results.length); i++) {
             console.log(i + " import: " + results[i]);
             importSong(results[i]);
-            console.log("imported "+i);
+            console.log("imported " + i);
         }
     });
 
+};
+
+var addUploadedSong = function (filePath, originalname) {
+    var newPath = path.join(importFolder, originalname);
+    console.log("add uploaded song: " + newPath);
+    fs.rename(filePath, newPath, function (err) {
+        if (!err) {
+            addSong(newPath);
+        }
+    });
 };
 
 /**
@@ -138,67 +148,67 @@ var importSong = function (songPath) {
     };
 
 
-   // var tags = nodeID3.read(songPath);
+    // var tags = nodeID3.read(songPath);
 
 
     var mm = require('musicmetadata');
 
 // create a new parser from a node ReadStream
     var fileStream = fs.createReadStream(songPath);
-    var parser = mm(fileStream,{ duration: true }, function (err, tags) {
+    var parser = mm(fileStream, {duration: true}, function (err, tags) {
         if (err) throw err;
-        if(tags.picture){
-        //Todo: Bilder extrahieren
-        //Todo: Thumbnail erzeugung
+        if (tags.picture) {
+            //Todo: Bilder extrahieren
+            //Todo: Thumbnail erzeugung
             /*
-            if(tags.picture[0].format === "jpg"||tags.picture[0].format === "jpeg"){
+             if(tags.picture[0].format === "jpg"||tags.picture[0].format === "jpeg"){
 
-            }else if(tags.picture[0].format === "png"){
+             }else if(tags.picture[0].format === "png"){
 
-            }
-            */
+             }
+             */
         }
         fileStream.close();
         console.log(tags);
-        song.title = tags.title || splitedSongPath[splitedSongPath.length-1];
+        song.title = tags.title || splitedSongPath[splitedSongPath.length - 1];
         song.artist = tags.artist.join(', ') || "";
         song.album = tags.album || "";
         song.duration = tags.duration || null;
-        console.log("id: " + song.id + ", Title: " + song.title + ", Album: " + song.album + ", Artist: " + song.artist + ", Lange: "+song.duration);
+        console.log("id: " + song.id + ", Title: " + song.title + ", Album: " + song.album + ", Artist: " + song.artist + ", Lange: " + song.duration);
 
         fs.renameSync(songPath, newSongPath);
 
         addSong(song);
     });
-/*
-    console.log(tags);
-    song.title = tags.title || splitedSongPath[splitedSongPath.length-1];
-    song.artist = tags.artist || "";
-    song.album = tags.album || "";
-    song.length = tags.length || null;
+    /*
+     console.log(tags);
+     song.title = tags.title || splitedSongPath[splitedSongPath.length-1];
+     song.artist = tags.artist || "";
+     song.album = tags.album || "";
+     song.length = tags.length || null;
 
-    console.log("id: " + song.id + ", Title: " + song.title + ", Album: " + song.album + ", Artist: " + song.artist);
-*/
+     console.log("id: " + song.id + ", Title: " + song.title + ", Album: " + song.album + ", Artist: " + song.artist);
+     */
 
     /*
-    if(tags.image){
-        var imagePath = newSongPath+"."+tags.image.mime;
-        fs.writeFile(imagePath, tags.image.imageBuffer, 'binary', function(err) {
-            if(err) throw err;
-        });
+     if(tags.image){
+     var imagePath = newSongPath+"."+tags.image.mime;
+     fs.writeFile(imagePath, tags.image.imageBuffer, 'binary', function(err) {
+     if(err) throw err;
+     });
 
-        song.image = {
-            "id" : null,
-            "fullImagePath" : imagePath,
-            "thumbnailPath": imagePath
-        };
-    }
-*/
+     song.image = {
+     "id" : null,
+     "fullImagePath" : imagePath,
+     "thumbnailPath": imagePath
+     };
+     }
+     */
     /*
-    //Song verschieben
-    fs.renameSync(songPath, newSongPath);
-    addSong(song);
-    */
+     //Song verschieben
+     fs.renameSync(songPath, newSongPath);
+     addSong(song);
+     */
 };
 
 var addSong = function (song) {
@@ -270,6 +280,7 @@ module.exports = {
     "getPlaylistList": getPlaylistList,
     "checkNewSongs": checkNewSongs,
     "getSongByID": getSongByID,
-    "replaceSong": replaceSong
+    "replaceSong": replaceSong,
+    "addUploadedSong":addUploadedSong
 
 };

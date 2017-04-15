@@ -22,9 +22,8 @@ var http = require('http').Server(app);
 
 var app = express();
 
-multiparty = require('connect-multiparty');
-var multipartyMiddleware = multiparty();
-
+var multer  = require('multer')
+var upload = multer({ dest: 'uploads/' })
 
 
 
@@ -32,14 +31,6 @@ var multipartyMiddleware = multiparty();
 // For debug
 var morgan = require('morgan');
 app.use(morgan('dev'));
-
-var logger =require('morgan-body');
-
-var bodyParser =require('body-parser');
-app.use(bodyParser.json());
-
-// hook logger to express app
-logger(app);
 // End debug
 
 
@@ -55,13 +46,14 @@ logger(app);
  res.send("Ok");
  });
  */
-app.post('/songUpload', multipartyMiddleware, function(req, res) {
-    // We are able to access req.files.file thanks to
-    // the multiparty middleware
-    var file = req.files.file;
-    console.log(file.name);
-    console.log(file.type);
-});
+app.post('/songUpload', upload.single('song'), function (req, res, next) {
+    // req.file is the `avatar` file
+    // req.body will hold the text fields, if there were any
+    console.log("upload: "+req.file.originalname);
+    songbase.addUploadedSong(req.file.path, req.file.originalname);
+    res.send("ok");
+
+})
 
 app.get('/songlist.json', function (req, res) {
     res.send(songbase.getSongList());
