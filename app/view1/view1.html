@@ -36,6 +36,6 @@ Search:<input ng-model="queryInput" ng-change=changeFilter() type="text"/>
         <td>{{song.artist}}</td>
         <td>{{song.album}}</td>
         <td><img ng-src="{{song.image.thumbnailPath}}" width="50"></td>
-        <td> <a href="" ng-click="addSongToQueue(song.id)">add to Queue</a></td>
+        <td> <a href="" ng-click="addSongToQueue(song.id)">add to Queue</a> <a href="#!/editSong/{{song.id}}">edit Songinfo</a></td>
     </tr>
 </table>

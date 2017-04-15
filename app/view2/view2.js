@@ -9,15 +9,23 @@ angular.module('myApp.view2', ['ngRoute'])
         });
     }])
 
-    .controller('View2Ctrl', ['$scope', '$http','ngNotify', function (scope, http, ngNotify) {
+    .controller('View2Ctrl', ['$scope', '$http','ngNotify', 'socketio', function (scope, http, ngNotify,socket) {
+        /*
         http.get('api/v01/getSongQueue').success(function (data) {
             scope.changeQueue(data);
             //scope.$apply();
         });
+*/
+        http.get('api/v01/getSongQueue').then(function (response) {
+            scope.changeQueue(response.data);
+        }, function (e) {
+            console.log("Error: Queue holen")
+        });
+
         scope.changeQueue = function (queue) {
             scope.songQueue = queue;
         };
-        var socket = io();
+        //var socket = io();
         scope.removeFromQueue = function (id) {
             socket.emit("command:removeFromQueue", id);
             //Todo: pruefung ob Song wirklich entfernt wurde

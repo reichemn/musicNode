@@ -9,7 +9,7 @@ angular.module('myApp.view1', ['ngMaterial', 'ngRoute', 'ngNotify'])
         });
     }])
 
-    .controller('View1Ctrl', ['$scope', '$http', '$filter', '$interval', 'ngNotify', function (scope, http, filter, interval, ngNotify) {
+    .controller('View1Ctrl', ['$scope', '$http', '$filter', '$interval', 'ngNotify', 'socketio', function (scope, http, filter, interval, ngNotify, socket) {
         /*
          var song1 = new Song(0,"test title","test interpret","test album",new SongImage(0,"http://kingofwallpapers.com/song/song-010.jpg","https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcR8x47T7Nr_A7F_tos3oKOB3K4DwzFD7ZcKizWmLMPIikNB56in4g"),null);
          var song2 = new Song(1,"Song 2","zweiter interpret","zweites album",new SongImage(1,null,null),null);
@@ -17,11 +17,20 @@ angular.module('myApp.view1', ['ngMaterial', 'ngRoute', 'ngNotify'])
          scope.allSongs = [song1,song2,song3];
          */
         // Songlist vom Server holen
-        http.get('songlist.json').success(function (data) {
-            scope.allSongs = data;
+        http.get('songlist.json').then(function (response) {
+            scope.allSongs = response.data;
             scope.changeFilter();
             // scope.$apply();
+        }, function (e) {
+            console.log("Error: Songlist holen")
         });
+        /*
+         http.get('songlist.json').success(function (data) {
+         scope.allSongs = data;
+         scope.changeFilter();
+         // scope.$apply();
+         });
+         */
         scope.addSongToQueue = function (id) {
             socket.emit("command:addToQueue", id);
             //Todo: Pruefung ob der Song wirklich der Queue hinzugefuegt wurde.
@@ -30,11 +39,20 @@ angular.module('myApp.view1', ['ngMaterial', 'ngRoute', 'ngNotify'])
                 duration: 3000
             });
         };
-        //Socket io
-        var socket = io();
-        http.get("api/v01/getCurrentSong").success(function (data) {
-            scope.changeCurrentSong(data);
+
+        http.get('api/v01/getCurrentSong').then(function (response) {
+            scope.changeCurrentSong(response.data);
+        }, function (e) {
+            console.log("Error: Current Song holen")
         });
+
+        //Socket io
+        //var socket = io();
+        /*    http.get("api/v01/getCurrentSong").success(function (data) {
+         scope.changeCurrentSong(data);
+         });
+
+         */
         scope.timeLeft = {
             "min": "",
             "sec": ""

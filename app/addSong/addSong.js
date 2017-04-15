@@ -3,7 +3,7 @@
  */
 'use strict';
 
-angular.module('myApp.addSong', ['ngRoute', 'ngNotify'])
+angular.module('myApp.addSong', ['ngRoute', 'ngNotify', 'ngMaterial'])
 
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/addSong', {
@@ -12,7 +12,7 @@ angular.module('myApp.addSong', ['ngRoute', 'ngNotify'])
         });
     }])
 
-    .controller('addSongCtrl', ['$scope', '$http', 'ngNotify', function (scope, http, ngNotify) {
+    .controller('addSongCtrl', ['$scope', '$http', 'ngNotify', 'socketio', '$location', function (scope, http, ngNotify, socket, location) {
 
         var selectedSong = null;
         scope.songValid = false;
@@ -24,13 +24,23 @@ angular.module('myApp.addSong', ['ngRoute', 'ngNotify'])
                     scope.songValid = true;
                 })
 
-            }else{
+            } else {
                 scope.$apply(function () {
                     scope.songValid = false;
                 })
             }
         };
 
+        var waitForImport = function () {
+
+            socket.on('event:songImported', function (song) {
+                ngNotify.set('Song "' + song.title + '" imported!', {
+                    type: 'info',
+                    duration: 3000
+                });
+                location.path('/editSong/' + song.id);
+            });
+        };
 
         scope.startUpload = function () {
             if (selectedSong != null) {
@@ -40,8 +50,8 @@ angular.module('myApp.addSong', ['ngRoute', 'ngNotify'])
 
         scope.songUpload = {
             "result": null,
-            "progress" : -1
-        }
+            "progress": -1
+        };
 
         scope.setProgress = function (value) {
             scope.songUpload.progress = value;
@@ -67,6 +77,7 @@ angular.module('myApp.addSong', ['ngRoute', 'ngNotify'])
 
             //Fügt dem formData Objekt unser File Objekt hinzu
             formData.append("song", file);
+            formData.append("clientID", socket.clientID);
 
             client.onerror = function (e) {
                 ngNotify.set('Upload fehlgeschlagen.', {
@@ -79,6 +90,9 @@ angular.module('myApp.addSong', ['ngRoute', 'ngNotify'])
                 //document.getElementById("prozent").innerHTML = "100%";
                 //prog.value = prog.max;
                 console.log(this.responseText);
+                scope.$apply(function () {
+                    scope.songUpload.result = true;
+                });
                 ngNotify.set('Upload abgeschlossen.', {
                     type: 'success',
                     duration: 3000
@@ -101,6 +115,8 @@ angular.module('myApp.addSong', ['ngRoute', 'ngNotify'])
 
             client.open("POST", "songUpload");
             client.send(formData);
+
+            waitForImport();
         };
 
     }]);

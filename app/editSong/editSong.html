@@ -1,10 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<form name="editSongForm" class="css-form" novalidate>
+    <label>Title:
+        <input type="text" ng-model="song.title" name="uTitle"/>
 
-</body>
-</html>
+    </label>
+    <br/>
+    <label>Artist:
+        <input type="text" ng-model="song.artist" name="uArtist"/>
+    </label>
+    <br/>
+    <label>Album:
+        <input type="text" ng-model="song.album" name="uAlbum"/>
+    </label>
+</form>
+<input type="submit" ng-click="saveSong()" value="Save"/>

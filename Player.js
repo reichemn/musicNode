@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Created by Anwender on 07.04.2017.
  */
@@ -122,7 +123,7 @@ var play = function (song) {
                 player = null;
 
             }
-            currentSong = null
+            currentSong = null;
 
             tick();
 
@@ -151,7 +152,7 @@ var play = function (song) {
  */
 var setQueueChangeCallback = function (callback) {
     queueChangeCallback = callback;
-}
+};
 
 /**
  * Stopt die aktuelle Wiedergabe

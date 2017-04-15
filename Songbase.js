@@ -13,6 +13,9 @@ const md5File = require('md5-file');
 var HashMap = require('hashmap');
 var SongClass = require("./app/scripts/Song.js");
 
+// uploadedSongId ist vortlaufende Nummer um einen hochgeladenen Song zur bearbeitung zu referenzieren
+var uploadedSongId = 0;
+
 //var songList = [];
 var playlistList = [];
 var songMap = new HashMap();
@@ -30,7 +33,7 @@ var init = function () {
     if (!fs.existsSync("./songbase/songs")) {
         fs.mkdirSync("./songbase/songs");
     }
-}
+};
 init();
 
 var load = function () {
@@ -81,23 +84,31 @@ var checkNewSongs = function () {
 
 };
 
-var importUploadedSong = function (filePath, originalname) {
+var importUploadedSong = function (filePath, originalname, callback) {
     var newPath = path.join(importFolder, originalname);
     console.log("import uploaded song: " + newPath);
     fs.rename(filePath, newPath, function (err) {
         if (!err) {
-            importSong(newPath);
-        }else {
-            console.log("Error move uploaded Song: "+err);
+            importSong(newPath, callback);
+        } else {
+            console.log("Error move uploaded Song: " + err);
         }
     });
+};
+
+/**
+ * Uerberschreibt einen Song
+ * @param song
+ */
+var overrideSong = function (song) {
+    addSong(song);
 };
 
 /**
  * Importiert einen Song am angegebenen Pfad
  * @songPath Pfad zur Datei
  */
-var importSong = function (songPath) {
+var importSong = function (songPath, callback) {
     if (!isAudiofile(songPath)) {
         return;
     }
@@ -113,6 +124,7 @@ var importSong = function (songPath) {
 
     song.id = md5File.sync(songPath);
 
+    // Todo: song.id in base64 statt base16 speichern
     //Pfad realtive zu ./ setzen
     songPath = path.relative('./', songPath);
 
@@ -182,6 +194,9 @@ var importSong = function (songPath) {
         fs.renameSync(songPath, newSongPath);
 
         addSong(song);
+        if (callback) {
+            callback(song);
+        }
     });
     /*
      console.log(tags);
@@ -284,6 +299,6 @@ module.exports = {
     "checkNewSongs": checkNewSongs,
     "getSongByID": getSongByID,
     "replaceSong": replaceSong,
-    "importUploadedSong":importUploadedSong
-
+    "importUploadedSong": importUploadedSong,
+    "overrideSong": overrideSong
 };

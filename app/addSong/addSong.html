@@ -7,7 +7,10 @@
         <span class="progress" ng-show="songUpload.progress >= 0">
                   <div style="width:{{songUpload.progress}}%" ng-bind="songUpload.progress + '%'" class="ng-binding"></div>
               </span>
-        <span ng-show="songUpload.result">Upload Successful</span>
+        <div ng-show="songUpload.result">
+            <p>Processing Song...</p>
+            <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+        </div>
     </fieldset>
     <br>
 </form>
