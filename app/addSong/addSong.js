@@ -38,7 +38,10 @@ angular.module('myApp.addSong', ['ngRoute', 'ngNotify', 'ngMaterial'])
                     type: 'info',
                     duration: 3000
                 });
-                location.path('/editSong/' + song.id);
+                scope.$apply(function () {
+                    location.path('/editSong/' + song.id).replace();
+                });
+
             });
         };
 
