@@ -81,7 +81,7 @@ angular.module('myApp.view1', ['ngMaterial', 'ngRoute', 'ngNotify'])
                         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
                         minutes = ("00" + minutes).substr(-2, 2);
                         seconds = ("00" + seconds).substr(-2, 2);
-                        
+
                         scope.timeLeft = {
                             "percent": ((1 - ((distance / 1000) / scope.playingSong.duration)) * 100),
                             "min": minutes,
