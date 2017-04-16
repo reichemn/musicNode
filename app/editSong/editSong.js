@@ -39,7 +39,7 @@ angular.module('myApp.editSong', ['ngRoute', 'ngNotify', 'ngMaterial'])
 
             }).then(function (response) {
                 console.log(response.data);
-                ngNotify.set('Changes saved!', {
+                ngNotify.set('Saved changes!', {
                     type: 'success',
                     duration: 3000
                 });

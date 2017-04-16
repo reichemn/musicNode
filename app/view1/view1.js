@@ -118,36 +118,36 @@ angular.module('myApp.view1', ['ngMaterial', 'ngRoute', 'ngNotify'])
                     case "all":
                         var hasTitle = false;
                         if (song.title) {
-                            hasTitle = song.title.indexOf(scope.queryInput || '') !== -1;
+                            hasTitle = song.title.toLowerCase().indexOf(scope.queryInput.toLocaleLowerCase() || '') !== -1;
                         }
                         var hasArtist = false;
                         if (song.artist) {
-                            hasArtist = song.artist.indexOf(scope.queryInput || '') !== -1;
+                            hasArtist = song.artist.toLowerCase().indexOf(scope.queryInput.toLowerCase() || '') !== -1;
                         }
                         var hasAlbum = false;
                         if (song.album) {
-                            hasAlbum = song.album.indexOf(scope.queryInput || '') !== -1;
+                            hasAlbum = song.album.toLowerCase().indexOf(scope.queryInput.toLowerCase() || '') !== -1;
                         }
                         return hasTitle || hasArtist || hasAlbum;
                         break;
                     case "title":
                         var hasTitle = false;
                         if (song.title) {
-                            hasTitle = song.title.indexOf(scope.queryInput || '') !== -1;
+                            hasTitle = song.title.toLowerCase().indexOf(scope.queryInput.toLowerCase() || '') !== -1;
                         }
                         return hasTitle;
                         break;
                     case "album":
                         var hasAlbum = false;
                         if (song.album) {
-                            hasAlbum = song.album.indexOf(scope.queryInput || '') !== -1;
+                            hasAlbum = song.album.toLowerCase().indexOf(scope.queryInput.toLowerCase() || '') !== -1;
                         }
                         return hasAlbum;
                         break;
                     case "artist":
                         var hasArtist = false;
                         if (song.artist) {
-                            hasArtist = song.artist.indexOf(scope.queryInput || '') !== -1;
+                            hasArtist = song.artist.toLowerCase().indexOf(scope.queryInput.toLowerCase() || '') !== -1;
                         }
                         return hasArtist;
                         break;
