@@ -6,6 +6,7 @@
         <button ng-disabled="!songValid"  ng-click="startUpload()">Upload</button>
         <span class="progress" ng-show="songUpload.progress >= 0">
                   <div style="width:{{songUpload.progress}}%" ng-bind="songUpload.progress + '%'" class="ng-binding"></div>
+                <md-progress-linear  md-mode="determinate" value="{{songUpload.progress}}"></md-progress-linear>
               </span>
         <div ng-show="songUpload.result">
             <p>Processing Song...</p>

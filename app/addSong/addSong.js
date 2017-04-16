@@ -57,7 +57,9 @@ angular.module('myApp.addSong', ['ngRoute', 'ngNotify', 'ngMaterial'])
         };
 
         scope.setProgress = function (value) {
-            scope.songUpload.progress = value;
+            scope.$apply(function () {
+                scope.songUpload.progress = value;
+            })
         };
 
         var client = null;
