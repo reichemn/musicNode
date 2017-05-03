@@ -4,7 +4,11 @@
  */
 
 //var audioPlayer = require("play-sound")({"player": "./mpg123/mpg123.exe"});
-var audioPlayer = require("play-sound")({"player": "./mplayer/mplayer.exe"});
+if(process.platform === 'win32'){
+    var audioPlayer = require("play-sound")({"player": "./mplayer/mplayer.exe"});
+}else{
+    var audioPlayer = require("play-sound")({"player": "mplayer"});
+}
 
 var songQueue = [];
 var playing = false;

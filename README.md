@@ -1,27 +1,32 @@
 ~~[mpg123] muss unter ./mpg123/ liegen. Die mpg123.exe muss also unter ./mpg123/mpg123.exe zu finden sein.~~
 [mplayer] muss unter ./mplayer/ liegen. Die mplayer.exe muss also unter ./mplayer/mplayer.exe zu finden sein.
 
-# `angular-seed` — the seed for AngularJS apps
+# nodeMusicPlayer
 
-This project is an application skeleton for a typical [AngularJS][angularjs] web app. You can use it
-to quickly bootstrap your angular webapp projects and dev environment for these projects.
-
-The seed contains a sample AngularJS application and is preconfigured to install the Angular
-framework and a bunch of development and testing tools for instant web development gratification.
-
-The seed app doesn't do much, just shows how to wire two controllers and views together.
+Dieses Projekt stellt einen Node basierten Musik Server dar.
+Die Wiedergabe wird über die Weboberfläche auf dem Server gestartet.
+Musik kann über die Weboberfläche auf den Server hochgeladen und somit der Mediathek hinzugefügt werden.
 
 
-## Getting Started
+## Voraussetzungen
 
 To get you started you can simply clone the `angular-seed` repository and install the dependencies:
 
-### Prerequisites
+### Mediaplayer
 
-You need git to clone the `angular-seed` repository. You can get git from [here][git].
+Standardmäßig wird mplayer verwendet, es kann allerdings jeder consolenbasierte Player verwendet werden.
 
-We also use a number of Node.js tools to initialize and test `angular-seed`. You must have Node.js
-and its package manager (npm) installed. You can get them from [here][node].
+#### Windows
+
+[mplayer] muss unter ./mplayer/ liegen. Die mplayer.exe muss also unter ./mplayer/mplayer.exe zu finden sein.
+
+#### Andere
+
+mplayer muss in der Pfad Variable enthalten sein, dazu kann er, falls verfügbar, z.B. über
+```
+apt-get install mplayer
+```
+installiert werden.
 
 ### Clone `angular-seed`
 
