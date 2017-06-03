@@ -4,9 +4,9 @@
  */
 
 //var audioPlayer = require("play-sound")({"player": "./mpg123/mpg123.exe"});
-if(process.platform === 'win32'){
+if (process.platform === 'win32') {
     var audioPlayer = require("play-sound")({"player": "./mplayer/mplayer.exe"});
-}else{
+} else {
     var audioPlayer = require("play-sound")({"player": "mplayer"});
 }
 
@@ -16,7 +16,7 @@ var player = null;
 var paused = false;
 var currentSong = null;
 // queueID ist forlaufende Nummer um Songs innerhalb der Queue eindeutig zu identifizieren
-var queueID = 0;
+var queueID = 1;
 var currentSongTimeout;
 var killFlag = false;
 var nextSongCallback = function (song) {
@@ -40,14 +40,77 @@ var removeSongFromQueue = function (id) {
         stop();
         return true;
     }
+    var idx = getIndexFromQueueID(id);
+    if (idx === -1) {
+        return false;
+    }
+    songQueue.splice(idx, 1);
+    queueChangeCallback(getQueue());
+    return true;
+};
+
+var getIndexFromQueueID = function (qID) {
     for (var i = 0; i < songQueue.length; i++) {
         if (songQueue[i].queueID === id) {
-            songQueue.splice(i, 1);
-            queueChangeCallback(getQueue());
-            return true;
+            return i;
         }
     }
-    return false;
+    return -1;
+};
+
+/**
+ * Veraendert die Position eines Songs in der Queue.
+ * @param oldQueueID ID des zu verschiebenden Songs
+ * @param newQueueID {> 0} unter diesen Song er eingefuegt
+ * @param newQueueID {= 0} song wird direkt gespielt.
+ * @returns {boolean} true wenn erfolgreich, sonst false
+ */
+var changeQueuePosition = function (oldQueueID, newQueueID) {
+    var idxOld = getIndexFromQueueID(oldQueueID);
+    var songToMove = null;
+    var songIsPlaying = false;
+    if(getIndexFromQueueID(newQueueID) === -1 && newQueueID !== 0){
+        //ziel exisitiert nicht
+        return false;
+    }else if(idxOld == getIndexFromQueueID(newQueueID)){
+        // old und new sind gleiche Position in queue
+        return true;
+    }
+    if (idxOld === -1) {
+        if (currentSong != null && currentSong.queueID == oldQueueID) {
+            // zuverschiebender Song laeuft schon
+            songIsPlaying = true;
+            songToMove = currentSong;
+        } else {
+            // zuverschiebender Song existiert nicht
+            return false;
+        }
+    } else {
+        // zuverschiebender Song war in songQueue
+        songToMove = songQueue[idxOld];
+        songQueue.splice(idxOld, 1);
+    }
+    if (newQueueID === 0) {
+        // song als nowPlaying einfuegen
+        if(songToMove === currentSong){
+            // old und new war gleich und laueft schon
+            return true;
+        }
+        play(songToMove);
+        songIsPlaying = false;
+    } else {
+        //Song in die queue einfuegen
+        var idxNew = getIndexFromQueueID(newQueueID);
+        songQueue.splice(idxNew, 0, songToMove);
+    }
+    if(songIsPlaying){
+        //durch stop wird queueChange callback aufgerufen
+        stop();
+    }else{
+        // sonst selbst callback aufrufen
+        queueChangeCallback(getQueue());
+    }
+
 };
 
 var addSong = function (song) {
@@ -67,6 +130,9 @@ var setNextSongCallback = function (callback) {
     nextSongCallback = callback;
 };
 
+/**
+ * Untested?
+ */
 var pause = function () {
     if (player != null) {
         stop();
@@ -75,6 +141,9 @@ var pause = function () {
     paused = true;
 };
 
+/**
+ * Untested?
+ */
 var resume = function () {
     paused = false;
     tick();
@@ -90,7 +159,7 @@ var getCurrentSong = function () {
 var tick = function () {
     if (player == null && !paused) {
         var naechsterSong = songQueue.shift();
-        if (naechsterSong!=null) {
+        if (naechsterSong != null) {
             play(naechsterSong);
         }
         queueChangeCallback(getQueue());
@@ -108,7 +177,7 @@ var play = function (song) {
     // Hier Moeglichkeiten fuer andere datenquellen
     if (song.source.type === "local") {
         console.log('Play Song ' + song.id + ': ' + song.title);
-        player = audioPlayer.play(song.source.path,{"./mplayer/mplayer.exe":['-really-quiet']}, function (err) {
+        player = audioPlayer.play(song.source.path, {"./mplayer/mplayer.exe": ['-really-quiet']}, function (err) {
             if (err) {
                 console.log("Player Error: " + err);
                 //player.kill();
@@ -180,5 +249,6 @@ module.exports = {
     "getCurrentSong": getCurrentSong,
     "getQueue": getQueue,
     "removeSongFromQueue": removeSongFromQueue,
-    "setQueueChangeCallback":setQueueChangeCallback
+    "setQueueChangeCallback": setQueueChangeCallback,
+    "changeQueuePosition" : changeQueuePosition
 };
