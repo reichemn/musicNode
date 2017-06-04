@@ -44,7 +44,7 @@ app.post('/songUpload', upload.single('song'), function (req, res, next) {
 
 });
 
-app.get('/api/v01/saveEditedSong',function (req, res, next) {
+app.get('/api/v01/saveEditedSong', function (req, res, next) {
     //console.log(req);
     var songChanges = req.query;
     if (songChanges) {
@@ -122,6 +122,12 @@ io.on('connection', function (socket) {
         var song = songbase.getSongByID(songID);
         // console.log('Play Song ' + songID+ ': '+song.title);
         playSong(song);
+    });
+    socket.on('command:reorderSongInQueue', function (songPositions) {
+        if (songPositions != null && songPositions.oldQueueID != null && songPositions.newQueueID != null) {
+            console.log("change queue position old: " + songPositions.oldQueueID + "  new : " + songPositions.newQueueID);
+            player.changeQueuePosition(songPositions.oldQueueID, songPositions.newQueueID);
+        }
     });
     socket.on('command:removeFromQueue', function (queueID) {
         console.log("remove from queue: " + queueID);

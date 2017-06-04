@@ -1,20 +1,47 @@
 <p>Song Queue ({{songQueue.length}} items):</p>
 <p>
 <hr>
-<table width="70%">
-  <tr>
-    <th>Title</th>
-    <th>Artist</th>
-    <th>Album</th>
-    <th>Image</th>
-    <th>Action</th>
-  </tr>
-  <tr ng-repeat="song in songQueue">
-    <td>{{song.title}}</td>
-    <td>{{song.artist}}</td>
-    <td>{{song.album}}</td>
-    <td><img ng-src="{{song.image.thumbnailPath}}" width="50"></td>
-    <td> <a href="" ng-click="removeFromQueue(song.queueID)">remove from Queue</a></td>
-  </tr>
+<table width="70%" ng-switch on="reorder">
+    <tr>
+        <th>Title</th>
+        <th>Artist</th>
+        <th>Album</th>
+        <th>Image</th>
+        <th>Action</th>
+    </tr>
+    <tr ng-repeat="song in songQueue" ng-switch-when="false">
+        <td>{{song.title}}</td>
+        <td>{{song.artist}}</td>
+        <td>{{song.album}}</td>
+        <td><img ng-src="{{song.image.thumbnailPath}}" width="50"></td>
+        <td><a href="" ng-click="removeFromQueue(song.queueID)">remove from Queue</a>
+            <a href="" ng-click="selectSong(song.queueID)">move Song</a></td>
+    </tr>
+    <tbody ng-switch-when="true">
+    <tr>
+        <td colspan="5">
+            <div class="queueCancel"><a href="" ng-click="insertSong(-1)">Cancel</a></div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            <div class="queueInsert"><a href="" ng-click="insertSong(0)">insert here</a></div>
+        </td>
+    </tr>
+    </tbody>
+    <tbody ng-repeat="song in songQueue" ng-switch-when="true">
+    <tr ng-class="{'selectedQueuePosition':selectedSongQueueID==song.queueID}">
+        <td>{{song.title}}</td>
+        <td>{{song.artist}}</td>
+        <td>{{song.album}}</td>
+        <td><img ng-src="{{song.image.thumbnailPath}}" width="50"></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            <div class="queueInsert"><a href="" ng-click="insertSong(song.queueID)">insert here</a></div>
+        </td>
+    </tr>
+    </tbody>
 </table>
 </p>

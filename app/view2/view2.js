@@ -11,11 +11,40 @@ angular.module('myApp.view2', ['ngRoute'])
 
     .controller('View2Ctrl', ['$scope', '$http','ngNotify', 'socketio', function (scope, http, ngNotify,socket) {
         /*
-        http.get('api/v01/getSongQueue').success(function (data) {
-            scope.changeQueue(data);
-            //scope.$apply();
-        });
-*/
+         http.get('api/v01/getSongQueue').success(function (data) {
+         scope.changeQueue(data);
+         //scope.$apply();
+         });
+         */
+        scope.reorder = false;
+        scope.selectedSongQueueID = -1;
+
+        scope.selectSong = function(id){
+            scope.selectedSongQueueID = id;
+            scope.reorder = true;
+        };
+
+        scope.insertSong = function(id){
+            if(scope.selectedSongQueueID !== -1 && id !== -1){
+                changeSongPositionInQueue(scope.selectedSongQueueID, id);
+            }
+            scope.reorder = false;
+        };
+
+        var changeSongPositionInQueue = function (oldQueueID, newQueueID) {
+            console.log("changeSongPositionInQueue old: "+oldQueueID+"  new: "+newQueueID);
+            var songPositions = {
+                oldQueueID:oldQueueID,
+                newQueueID:newQueueID
+            };
+            socket.emit('command:reorderSongInQueue', songPositions);
+            //Todo: pruefung ob Song wirklich verschoben wurde
+            ngNotify.set('Song moved!', {
+                type: 'success',
+                duration: 3000
+            });
+        };
+
         http.get('api/v01/getSongQueue').then(function (response) {
             scope.changeQueue(response.data);
         }, function (e) {

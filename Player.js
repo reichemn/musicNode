@@ -14,7 +14,6 @@ var songQueue = [];
 var playing = false;
 var player = null;
 var paused = false;
-var currentSong = null;
 // queueID ist forlaufende Nummer um Songs innerhalb der Queue eindeutig zu identifizieren
 var queueID = 1;
 var currentSongTimeout;
@@ -28,90 +27,67 @@ var queueChangeCallback = function (queue) {
 
 var getQueue = function () {
     // Aktuell spielender Song wird an erster Stelle des zurueckgebenen Arrays angefuegt
-    var currentSongArray = [];
-    if (currentSong != null) {
-        currentSongArray.push(currentSong);
-    }
-    return currentSongArray.concat(songQueue);
+    return songQueue;
 };
 
 var removeSongFromQueue = function (id) {
-    if (currentSong != null && currentSong.queueID == id) {
+    if (songQueue.length > 0 && songQueue[0].queueID == id) {
         stop();
         return true;
     }
     var idx = getIndexFromQueueID(id);
-    if (idx === -1) {
-        return false;
+    if (idx >= 0) {
+        songQueue.splice(idx, 1);
+        queueChangeCallback(getQueue());
+        return true;
     }
-    songQueue.splice(idx, 1);
-    queueChangeCallback(getQueue());
-    return true;
+
+
+    return false;
 };
 
+var changeQueuePosition = function (oldQueueID, newQueueID) {
+    var idxOld = getIndexFromQueueID(oldQueueID);
+    console.log("idxOld: " + idxOld);
+    var songToMove;
+    if ((getIndexFromQueueID(newQueueID) === -1 && newQueueID !== 0) || idxOld === -1) {
+        //ziel oder quelle exisitiert nicht
+        return false;
+    } else if ((oldQueueID === newQueueID) || (idxOld === 0 && newQueueID === 0)) {
+        // old und new sind gleiche Position in queue
+        return true;
+    }
+    // zuverschiebender Song war in songQueue
+    songToMove = songQueue[idxOld];
+    songQueue.splice(idxOld, 1);
+    if (newQueueID === 0) {
+        // song als nowPlaying einfuegen
+        songQueue.splice(1, 0, songToMove,songQueue[0]);
+    } else {
+        //Song in die queue einfuegen
+        var idxNew = getIndexFromQueueID(newQueueID);
+        console.log("idxNew: " + idxNew);
+        songQueue.splice(idxNew + 1, 0, songToMove);
+    }
+    if (getIndexFromQueueID(oldQueueID) === 0 || newQueueID === 0) {
+        //durch stop wird queueChange callback aufgerufen
+        stop();
+    } else {
+        // sonst selbst callback aufrufen
+        queueChangeCallback(getQueue());
+    }
+    return true;
+
+};
 var getIndexFromQueueID = function (qID) {
     for (var i = 0; i < songQueue.length; i++) {
-        if (songQueue[i].queueID === id) {
+        if (songQueue[i].queueID === qID) {
             return i;
         }
     }
     return -1;
 };
 
-/**
- * Veraendert die Position eines Songs in der Queue.
- * @param oldQueueID ID des zu verschiebenden Songs
- * @param newQueueID {> 0} unter diesen Song er eingefuegt
- * @param newQueueID {= 0} song wird direkt gespielt.
- * @returns {boolean} true wenn erfolgreich, sonst false
- */
-var changeQueuePosition = function (oldQueueID, newQueueID) {
-    var idxOld = getIndexFromQueueID(oldQueueID);
-    var songToMove = null;
-    var songIsPlaying = false;
-    if(getIndexFromQueueID(newQueueID) === -1 && newQueueID !== 0){
-        //ziel exisitiert nicht
-        return false;
-    }else if(idxOld == getIndexFromQueueID(newQueueID)){
-        // old und new sind gleiche Position in queue
-        return true;
-    }
-    if (idxOld === -1) {
-        if (currentSong != null && currentSong.queueID == oldQueueID) {
-            // zuverschiebender Song laeuft schon
-            songIsPlaying = true;
-            songToMove = currentSong;
-        } else {
-            // zuverschiebender Song existiert nicht
-            return false;
-        }
-    } else {
-        // zuverschiebender Song war in songQueue
-        songToMove = songQueue[idxOld];
-        songQueue.splice(idxOld, 1);
-    }
-    if (newQueueID === 0) {
-        // song als nowPlaying einfuegen
-        if(songToMove === currentSong){
-            // old und new war gleich und laueft schon
-            return true;
-        }
-        play(songToMove);
-        songIsPlaying = false;
-    } else {
-        //Song in die queue einfuegen
-        var idxNew = getIndexFromQueueID(newQueueID);
-        songQueue.splice(idxNew, 0, songToMove);
-    }
-    if(songIsPlaying){
-        //durch stop wird queueChange callback aufgerufen
-        stop();
-    }else{
-        // sonst selbst callback aufrufen
-        queueChangeCallback(getQueue());
-    }
-
-};
 
 var addSong = function (song) {
     song.queueID = queueID;
@@ -130,9 +106,6 @@ var setNextSongCallback = function (callback) {
     nextSongCallback = callback;
 };
 
-/**
- * Untested?
- */
 var pause = function () {
     if (player != null) {
         stop();
@@ -141,16 +114,13 @@ var pause = function () {
     paused = true;
 };
 
-/**
- * Untested?
- */
 var resume = function () {
     paused = false;
     tick();
 };
 
 var getCurrentSong = function () {
-    return currentSong;
+    return songQueue[0];
 };
 
 /**
@@ -158,14 +128,15 @@ var getCurrentSong = function () {
  */
 var tick = function () {
     if (player == null && !paused) {
-        var naechsterSong = songQueue.shift();
-        if (naechsterSong != null) {
-            play(naechsterSong);
+        //var naechsterSong = songQueue.shift();
+        if (songQueue.length > 0) {
+            // songQueue.splice(0,0,naechsterSong);
+            play(songQueue[0]);
         }
         queueChangeCallback(getQueue());
-        nextSongCallback(naechsterSong);
+        nextSongCallback(songQueue[0]);
     } else if (player == null) {
-        currentSong = null;
+        //currentSong = null;
     }
 };
 
@@ -191,19 +162,20 @@ var play = function (song) {
                 clearTimeout(currentSongTimeout);
             }
             if (player != null) {
-                console.log("kill " + currentSong.title);
+                console.log("kill " + songQueue[0].title);
                 player.kill();
                 player = null;
 
             }
-            currentSong = null;
+            //currentSong = null;
+            songQueue.shift();
 
             tick();
 
         });
     }
-    currentSong = song;
-    currentSong.endTime = new Date().getTime() + (song.duration ) * 1000;
+    //currentSong = song;
+    songQueue[0].endTime = new Date().getTime() + (song.duration ) * 1000;
     // currentSongTimeout = setTimeout(function () {
     //     if (currentSongTimeout != null) {
     //         clearTimeout(currentSongTimeout);
@@ -232,12 +204,12 @@ var setQueueChangeCallback = function (callback) {
  */
 var stop = function () {
     if (player != null) {
-        console.log("kill " + currentSong.title);
+        console.log("kill " + songQueue[0].title);
         player.kill();
         player = null;
 
     }
-    currentSong = null;
+    //currentSong = null;
     //tick();
 };
 
@@ -250,5 +222,5 @@ module.exports = {
     "getQueue": getQueue,
     "removeSongFromQueue": removeSongFromQueue,
     "setQueueChangeCallback": setQueueChangeCallback,
-    "changeQueuePosition" : changeQueuePosition
+    "changeQueuePosition": changeQueuePosition
 };
